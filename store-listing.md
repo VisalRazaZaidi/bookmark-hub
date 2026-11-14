@@ -145,13 +145,9 @@ Bookmark Hub processes bookmark titles, URLs, folders and dates locally in the b
 
 ## Privacy policy URL
 
-Host `site/privacy.html` (see `site/README.md`), then paste the public URL here:
+Live at **https://visalrazazaidi.github.io/bookmark-hub/privacy.html** (GitHub Pages). Paste that URL into the Chrome Web Store dashboard.
 
-```
-https://REPLACE-WITH-YOUR-DOMAIN/privacy.html
-```
-
-The URL must be publicly reachable without a login. GitHub Pages, Netlify, Cloudflare Pages and Vercel all work.
+The URL is publicly reachable without a login. If the site ever moves, update this file and the store dashboard.
 
 ## Store assets
 
@@ -190,7 +186,7 @@ Bookmark Hub - every bookmark, one searchable page.
 4. Add the five screenshots and the 440x280 promo tile.
 5. Select Productivity, English, and the regions you want to distribute in.
 6. Fill the Privacy practices tab: single purpose, permission justifications, data usage, remote code = No.
-7. Host `site/privacy.html` and add its public URL.
+7. Privacy policy is already hosted at https://visalrazazaidi.github.io/bookmark-hub/privacy.html; paste that URL.
 8. Add the support contact (the Support tab on the listing is enough; no personal email needed).
 9. Submit for review. Broad optional host permissions can add review time; the justification above explains that it is opt-in and preview-only.
 

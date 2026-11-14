@@ -4,6 +4,8 @@ Click the toolbar icon (or press **Alt+B**) to open all your bookmarks in a new 
 
 Free, no account, no analytics, no server. Your bookmarks never leave the browser.
 
+**Links:** [Landing page](https://visalrazazaidi.github.io/bookmark-hub/) · [Download](https://github.com/VisalRazaZaidi/bookmark-hub/releases/latest) · [Privacy policy](https://visalrazazaidi.github.io/bookmark-hub/privacy.html)
+
 ## What it does
 
 - **Real folders.** The sidebar mirrors the browser's bookmark tree with live counts, plus Recently added, Duplicates, Missing titles and Top sites.
@@ -22,7 +24,16 @@ New in **1.1.0**:
 
 ## Install
 
-### Chrome, Edge, Brave (unpacked, for development)
+### Download (Chrome, Edge, Brave)
+
+1. Download `bookmark-hub-chrome.zip` from [Releases](https://github.com/VisalRazaZaidi/bookmark-hub/releases/latest) and unzip it.
+2. Open `chrome://extensions` (or `brave://extensions`, `edge://extensions`) and turn on **Developer mode**.
+3. Click **Load unpacked** and select the unzipped folder.
+4. Click the Bookmark Hub icon, or press **Alt+B**.
+
+The Chrome Web Store listing is coming later; until then this is the install path the landing page links to.
+
+### Chrome, Edge, Brave (from source, for development)
 
 1. Run `python build.py` (or use the included `dist/chrome` folder).
 2. Open `chrome://extensions` and turn on **Developer mode**.
@@ -75,7 +86,7 @@ The source folder is the single source of truth; the browser-specific manifests 
 - Bookmarks are read locally with the browser's bookmarks API and never leave your browser.
 - Page previews (optional) are fetched directly from each bookmarked site and cached in this browser. The optional all-sites permission is requested only when you enable previews and can be removed in Settings.
 - Site icons come from Google's icon service by default (this sends each site's domain to Google). Turn it off in Settings.
-- The full policy is in `site/privacy.html`.
+- The full policy is at https://visalrazazaidi.github.io/bookmark-hub/privacy.html (source: `site/privacy.html`).
 
 ## Project layout
 

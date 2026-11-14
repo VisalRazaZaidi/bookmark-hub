@@ -384,6 +384,9 @@
   .install-card .btn { width: 100%; margin-top: 18px; }
   .install-card small { display: block; margin-top: 12px; font-size: 12.5px; color: var(--mute); text-align: center; }
   .browser-note { margin-top: 16px; font-size: 13px; color: var(--mute); text-align: center; }
+  .browser-note a, .dl-links a { color: var(--accent); font-weight: 600; text-decoration: none; }
+  .browser-note a:hover, .dl-links a:hover { text-decoration: underline; }
+  .dl-links { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 10px; font-size: 14px; }
 
   /* faq */
   .faq-wrap { max-width: 820px; }
@@ -759,7 +762,8 @@
           <li>
             <div>
               <h3>Add Bookmark Hub to your browser</h3>
-              <p>Install it from the Chrome Web Store. Edge and Brave can install Chrome extensions too. Firefox users can install the signed build from Firefox's add-ons site.</p>
+              <p>The Chrome Web Store listing is coming. For now, download the build, unzip it, open your browser's extensions page (<code>brave://extensions</code>, <code>chrome://extensions</code> or <code>edge://extensions</code>), turn on <b>Developer mode</b> and choose <b>Load unpacked</b>.</p>
+              <p class="dl-links"><a href="https://github.com/VisalRazaZaidi/bookmark-hub/releases/latest/download/bookmark-hub-chrome.zip">Chrome / Edge / Brave zip</a><a href="https://github.com/VisalRazaZaidi/bookmark-hub/releases/latest/download/bookmark-hub-firefox.zip">Firefox zip</a></p>
             </div>
           </li>
           <li>
@@ -787,6 +791,7 @@
         <a class="btn js-store" href="#install">Add to Chrome</a>
         <small>Free. No account. No ads.</small>
         <p class="browser-note">Works in Chrome, Edge and Brave. A Firefox build is available separately.</p>
+        <p class="browser-note"><a href="https://github.com/VisalRazaZaidi/bookmark-hub">Source and releases on GitHub</a></p>
       </aside>
     </div>
   </section>
@@ -837,11 +842,12 @@
       <span>Bookmark Hub</span>
     </a>
     <nav class="foot-links" aria-label="Footer">
+      <a href="https://github.com/VisalRazaZaidi/bookmark-hub">GitHub</a>
       <a href="privacy.html">Privacy</a>
       <a href="#faq">FAQ</a>
       <a href="#install">Install</a>
     </nav>
-    <p class="foot-note">Bookmarks stay in your browser. Questions and bug reports: use the Support tab on the Chrome Web Store listing.</p>
+    <p class="foot-note">Bookmarks stay in your browser. Questions and bug reports: open an issue on GitHub.</p>
   </div>
 </footer>
 

@@ -2,6 +2,8 @@
 
 Last verified on disk: 2026-11-14. Repository: `D:\coding\bookmark-hub`.
 
+Live: https://visalrazazaidi.github.io/bookmark-hub/ · Privacy: https://visalrazazaidi.github.io/bookmark-hub/privacy.html · GitHub: https://github.com/VisalRazaZaidi/bookmark-hub
+
 ## 1. Goal
 
 The user (Pakistan-based full-stack dev, writes Roman Urdu mixed with English, wants direct and actionable replies) found the browser's bookmark UI poor for browsing and searching. Bookmark Hub is a **browser extension**:
@@ -20,7 +22,7 @@ The user (Pakistan-based full-stack dev, writes Roman Urdu mixed with English, w
 | Store screenshots (1280x800 x5) + promo tiles (440x280, 1400x560) | Done: `screenshots/`, built from sample data, not the user's bookmarks |
 | `store-listing.md` | Done: copy, permission justifications, data-usage answers, checklist |
 | Landing page `site/index.html` + `site/privacy.html` | Done, responsive, working search demo, no console errors |
-| Hosting the landing page | **Manual step remains.** The user must publish `site/` and paste the URL into the store dashboard and the `STORE_URL` constant |
+| Hosting the landing page | **Done.** Public repo `VisalRazaZaidi/bookmark-hub`, deployed by `.github/workflows/pages.yml` to GitHub Pages |
 | Publishing to the stores | **Manual step remains.** Developer account, US$5 fee, upload zips, submit for review |
 
 Nothing is left in the code that blocks submission. The remaining work is account/hosting actions in section 7.
@@ -52,11 +54,13 @@ D:\coding\bookmark-hub\
     privacy.html         effective 2026-11-13, facts in section 7.3 of the old handoff, plus fonts note
     assets/              icon-32.png, icon-128.png
     README.md            hosting, STORE_URL and privacy-URL steps
+  .github/workflows/pages.yml   deploys site/ to GitHub Pages on push to main
   screenshots/           01-all-bookmarks.png ... 05-compact-list.png (1280x800)
                          promo-small-440x280.png, promo-marquee-1400x560.png, promo.html (source)
   demo/bookmarks-demo.html   28 sample bookmarks in 7 folders, 3 duplicate pairs, 2 untitled
   dist/                  build output; regenerate with build.py, do not edit by hand
   .gitignore             dist/ and OS junk
+  .gitattributes         LF line endings, binary assets
 ```
 
 ## 4. How the extension works (key behavior)
@@ -97,13 +101,14 @@ D:\coding\bookmark-hub\
 
 ## 7. Remaining work (manual, no code)
 
-### 7.1 Host the site
+### 7.1 The site is hosted
 
-`site/` is already complete. Use GitHub Pages (`/site`), Netlify, Cloudflare Pages or any static host. Then:
+- Landing page: https://visalrazazaidi.github.io/bookmark-hub/
+- Privacy policy: https://visalrazazaidi.github.io/bookmark-hub/privacy.html
+- Repository: https://github.com/VisalRazaZaidi/bookmark-hub (public, because free GitHub Pages requires it)
+- Release: https://github.com/VisalRazaZaidi/bookmark-hub/releases/tag/v1.1.0 with both zips attached
 
-1. Open `site/index.html`, find `const STORE_URL = "";` near the bottom, and paste the public Chrome Web Store listing URL. While empty, the buttons scroll to the install section.
-2. Put the public privacy URL (e.g. `https://domain/privacy.html`) into the Chrome Web Store dashboard and into `store-listing.md`.
-3. If self-hosting fonts, follow `site/README.md` and update the last paragraph of the privacy page.
+Pushing to `main` redeploys the site through GitHub Actions. The privacy URL above is already filled into `store-listing.md`. When the Chrome Web Store listing exists, paste its URL into `const STORE_URL = "";` in `site/index.html` and push again; until then the store buttons scroll to the install section, which now links to the GitHub release downloads.
 
 ### 7.2 Publish
 
@@ -138,6 +143,8 @@ D:\coding\bookmark-hub\
 python build.py                 # rebuild both zips
 npx web-ext lint --source-dir dist/firefox --output text
 ```
+
+The landing page deploys automatically on every push to `main` (`.github/workflows/pages.yml`).
 
 To verify the extension in a browser, load `dist/chrome` unpacked at `chrome://extensions`, or use Playwright with the Chrome for Testing executable and
 `--disable-extensions-except=dist/chrome --load-extension=dist/chrome`.

@@ -25,9 +25,9 @@ Everything else in the repository belongs to the extension.
    empty, every "Add to Chrome" button scrolls to the install section, so the
    page is safe to publish before the listing is live.
 
-2. **Privacy URL.** Host `privacy.html`, then put its full public URL
-   (for example `https://example.com/privacy.html`) into the Chrome Web Store
-   developer dashboard and into `store-listing.md`.
+2. **Privacy URL.** Already hosted at
+   `https://visalrazazaidi.github.io/bookmark-hub/privacy.html`; use that URL in
+   the Chrome Web Store dashboard and in `store-listing.md`.
 
 3. **Optional: self-host the fonts.** The pages load Bricolage Grotesque and
    Inter from Google Fonts. To remove that third-party request, copy
@@ -38,14 +38,20 @@ Everything else in the repository belongs to the extension.
 
 ## Hosting
 
-Any static host works. The pages have no server-side code, cookies or analytics.
+The site is live on GitHub Pages:
 
-- **GitHub Pages:** push this repository, then Settings > Pages > deploy from
-  branch, folder `/site` (or copy the three items to a `docs/` folder).
-- **Netlify / Cloudflare Pages / Vercel:** drag the `site` folder in, or point
-  the project at it. No build command, no output directory.
-- **Any web server:** copy `index.html`, `privacy.html` and `assets/` to the same
-  directory.
+- **Landing page:** https://visalrazazaidi.github.io/bookmark-hub/
+- **Privacy policy:** https://visalrazazaidi.github.io/bookmark-hub/privacy.html
+- **Repository:** https://github.com/VisalRazaZaidi/bookmark-hub
+
+Deployment is automatic: `.github/workflows/pages.yml` uploads this `site/`
+folder whenever `main` changes. Enable it once under Settings > Pages >
+Source: **GitHub Actions**. No build command, no output directory.
+
+Any other static host also works: drag the `site` folder into Netlify or
+Cloudflare Pages, or copy `index.html`, `privacy.html` and `assets/` to the same
+directory on any web server. The pages have no server-side code, cookies or
+analytics.
 
 Open `privacy.html` directly from the site root; the landing page links to it as
 `privacy.html`, so both files must stay side by side.
