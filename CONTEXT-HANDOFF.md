@@ -15,7 +15,9 @@ The user (Pakistan-based full-stack dev, writes Roman Urdu mixed with English, w
 
 | Item | State |
 |---|---|
-| Extension v1.1.0 source | Done and tested in Chromium |
+| Extension v1.2.0 source | Done and tested in Chromium (sharing + selection) |
+| Sharing (v1.2.0) | Done: share the current view (folder/search/Duplicates/site/all) as a link list, Markdown or Netscape bookmark file; per-card share; native share sheet when available. Local-only, no new permissions |
+| Selection mode (v1.2.0) | Done: toolbar toggle, card checkboxes, Shift-click range, "Select all visible", sticky bar, share selected. Esc exits |
 | Fix: second toolbar click opened a duplicate tab | Done (runtime ping, no `tabs` permission), tested |
 | Fix: deleting a duplicate seemed to delete all copies | Done. Unique-id delete, no confirm dialog, 8 s Undo that restores folder + position. Tested |
 | Chrome + Firefox build script and zips | Done: `build.py` -> `dist/bookmark-hub-chrome.zip`, `dist/bookmark-hub-firefox.zip` |
@@ -31,7 +33,8 @@ Nothing is left in the code that blocks submission. The remaining work is accoun
 
 ```
 D:\coding\bookmark-hub\
-  manifest.json          MV3 v1.1.0. perms: bookmarks, storage. optional_host_permissions: <all_urls>.
+  manifest.json          MV3 v1.2.0. perms: bookmarks, storage. optional_host_permissions: <all_urls>.
+                         Sharing adds no permissions and no network access.
                          Both background.service_worker and background.scripts are present in the source
                          (Chrome uses one, Firefox the other); build.py splits them.
                          gecko id bookmark-hub@visalraza.dev, min Firefox 140, command _execute_action Alt+B.
@@ -43,7 +46,10 @@ D:\coding\bookmark-hub\
   js/data.js             BHData: loadLive(), parseHtml() for Netscape exports, removeBookmark(id)
                          (returns the removed node), restoreBookmark(node), onChange()
   js/previews.js         BHPreviews: optional og:image/title/description/icon fetcher + cache
-  js/app.js              all UI logic, search, grouping, ping responder, undo toast
+  js/share.js            BHShare: pure text/Markdown/Netscape builders, preview, copy, download,
+                         filename, canNative/shareNative. No DOM state, no network.
+  js/app.js              all UI logic, search, grouping, ping responder, undo toast,
+                         share dialog, selection mode, per-card share
   fonts/                 bricolage.woff2, inter.woff2 (bundled)
   icons/                 icon-16/32/48/128.png
   build.py               builds dist/chrome, dist/firefox and both zips
@@ -51,7 +57,7 @@ D:\coding\bookmark-hub\
   README.md              install, build, features, privacy summary
   site/                  static landing page + privacy policy (no build step)
     index.html           hero with a working 28-bookmark search demo, sections, FAQ, install
-    privacy.html         effective 2026-11-13, facts in section 7.3 of the old handoff, plus fonts note
+    privacy.html         effective 2026-11-14, includes a sharing section
     assets/              icon-32.png, icon-128.png
     README.md            hosting, STORE_URL and privacy-URL steps
   .github/workflows/pages.yml   deploys site/ to GitHub Pages on push to main
@@ -74,6 +80,7 @@ D:\coding\bookmark-hub\
 - **Live sync**: bookmark created/removed/changed/moved events trigger a debounced reload.
 - **Single tab**: the hub page listens for `bookmark-hub:ping` and replies with its tab/window id; the background focuses that tab, otherwise opens a new one. No `tabs` permission is needed.
 - **Delete/Undo**: clicking Delete on a card calls `bookmarks.remove(id)` for that unique id only. `removeBookmark` returns the node first; the toast offers Undo for 8 s, and `restoreBookmark` calls `bookmarks.create` with the original parentId and index. No confirmation dialog.
+- **Sharing**: exports exactly the items currently rendered (`visible`, same as the header count). `BHShare.text/markdown/netscape` build the body; dedupe is on by default (screen order wins), grouping follows the immediate folder. Netscape output is importable and keeps folder hierarchy and `ADD_DATE`. The dialog offers copy, download, and a native share sheet when `navigator.share` exists. Selection mode adds checkboxes with Shift-range and "Select all visible", and shares only the picked cards. Everything is local; there is no fetch, backend or new permission.
 - **Settings**: theme (auto/light/dark), open in new tab vs same tab, site icons on/off, preview controls (fetch missing, clear cache, turn off).
 
 ## 5. Bugs reported and how they were handled
@@ -83,6 +90,9 @@ D:\coding\bookmark-hub\
 
 ## 6. Tests run on 2026-11-14
 
+- **Sharing, preview mode** (`share-test.js`, 39 checks, ALL PASS): imported `demo/bookmarks-demo.html` (28 cards); dialog count and scope label; dedupe 28 -> 25 with "3 duplicate links skipped"; clipboard has 25 links; Markdown preview and button label; `.html` download starts with the Netscape doctype, has 25 anchors, folder headings and escaped ampersands; round-trip imports 25 cards and 7 folder rows; folder scope (Recipes, 3 links, root `<H1>`); search scope ("sourdough", 1 link); empty search disables Share; selection mode, Shift-range (4), share-selected label, Esc behavior, "Select all visible" (25); dedupe off still copies 25 remaining links; dialog fits at 1280 and 400/360 px with no horizontal overflow; zero page errors.
+- **Sharing, live extension** (`live-share-test.js`, ALL PASS): `dist/chrome` seeded with 4 cards including a duplicate, an untitled bookmark, an ampersand URL and a nested folder; dedupe reports 1 duplicate; clipboard has 3 links; untitled bookmark falls back to its URL as title; file escapes `&` and keeps the nested folder; folder scope label/count; selection + delete keeps the count honest; Undo toast appears; share-selected shows the right count; ping returns the exact tab/window; zero page errors.
+- **Existing delete/undo/ping regression** (`test.js`): still passes.
 - **Extension, Chrome for Testing 159** (Playwright, `--load-extension=dist/chrome`, fresh profile):
   - seeded 6 bookmarks (one 3-copy group, one pair, one untitled): page showed 6 cards, Duplicates 3, Missing titles 1;
   - Duplicates view showed 5 cards; deleting one showed 4, API confirmed exactly one removed;
@@ -106,7 +116,7 @@ D:\coding\bookmark-hub\
 - Landing page: https://visalrazazaidi.github.io/bookmark-hub/
 - Privacy policy: https://visalrazazaidi.github.io/bookmark-hub/privacy.html
 - Repository: https://github.com/VisalRazaZaidi/bookmark-hub (public, because free GitHub Pages requires it)
-- Release: https://github.com/VisalRazaZaidi/bookmark-hub/releases/tag/v1.1.0 with both zips attached
+- Release: https://github.com/VisalRazaZaidi/bookmark-hub/releases/tag/v1.2.0 with both zips attached (v1.1.0 is the previous release)
 
 Pushing to `main` redeploys the site through GitHub Actions. The privacy URL above is already filled into `store-listing.md`. When the Chrome Web Store listing exists, paste its URL into `const STORE_URL = "";` in `site/index.html` and push again; until then the store buttons scroll to the install section, which now links to the GitHub release downloads.
 
