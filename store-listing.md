@@ -1,7 +1,7 @@
 # Bookmark Hub - Chrome Web Store listing
 
 Copy each block into the matching field in the Chrome Web Store developer dashboard.
-Version: 1.1.0. Package: `dist/bookmark-hub-chrome.zip`.
+Version: 1.2.0. Package: `dist/bookmark-hub-chrome.zip`.
 
 ---
 
@@ -14,10 +14,10 @@ Bookmark Hub
 ## Summary (max 132 characters)
 
 ```
-All your bookmarks on one fast, visual page. Folders, page previews and search that understands site: and folder:.
+All your bookmarks on one fast, visual page. Folders, page previews, search operators, and sharing without a server.
 ```
 
-Character count: 116.
+Character count: 119.
 
 ## Category
 
@@ -53,6 +53,9 @@ The sidebar mirrors your real folder tree with live counts, plus Recently added,
 RECOGNISE PAGES BY SIGHT
 Cards use the site's own page preview image and real title when previews are enabled (optional, asked once). Without previews, each card gets a coloured tile built from the site name and its icon. Nothing is uploaded: previews are fetched straight from the bookmarked page and cached in this browser.
 
+SHARE WITHOUT A SERVER
+Share exactly what is on screen: a folder, a search result or a set of hand-picked cards. Choose a plain link list for chat and email, Markdown for docs and notes, or a standard bookmark file (.html) that Chrome, Edge, Firefox and Safari can import with folder names intact. Duplicate links can be skipped with one toggle, and the file is built inside the page. Nothing is uploaded, there is no share server, and the recipient does not need Bookmark Hub.
+
 TIDY UP WITHOUT LOSING ANYTHING
 Duplicates counts the extra copies of the same link, so you can find them fast. Missing titles shows bookmarks saved with no name. Delete removes exactly the copy you clicked, and an Undo button is available for 8 seconds to put it back in the same folder and position.
 
@@ -60,7 +63,7 @@ WORKS WITH YOUR BROWSER
 Live updates: adding, moving, renaming or deleting a bookmark in the browser shows up on the page right away. Light and dark themes follow the system or your choice. Open bookmarks in a new tab or the current one. Works in Chrome, Edge and Brave. A Firefox build is available from addons.mozilla.org.
 
 PRIVATE BY DESIGN
-No account, no server, no analytics, no tracking. Your bookmarks never leave the browser. Site icons are loaded from Google's favicon service by default (that sends each bookmarked domain to Google); you can turn this off in Settings. Page previews are off until you enable them.
+No account, no server, no analytics, no tracking. Your bookmarks never leave the browser. Sharing is a local export: the link text or bookmark file is generated in the page and only leaves your device when you copy it or save it. Site icons are loaded from Google's favicon service by default (that sends each bookmarked domain to Google); you can turn this off in Settings. Page previews are off until you enable them.
 
 FREE
 No subscription, no sign-up, no ads.
@@ -107,6 +110,8 @@ Optional keyboard shortcut that opens the Bookmark Hub page, the same action as 
 - No `tabs` permission: the toolbar shortcut finds an already-open hub tab with a runtime message, not by reading tab URLs.
 - No `history`, `downloads`, `cookies`, `scripting` or content scripts.
 
+Sharing adds **no permissions**: the export is built from the bookmarks already loaded in the page, and the file is saved with a normal browser download initiated by the user. There is no network request and no host permission involved.
+
 ## Remote code
 
 Answer: **No, I am not using remote code.**
@@ -130,6 +135,7 @@ Chrome asks what the extension handles and what the developer does with it.
 | Web history? | Bookmarks are read locally so they can be displayed and searched. They are not transmitted. Declare this if the form treats saved URLs as web history. |
 | User activity? | No |
 | Website content? | Optional previews read a bookmarked page's title, description and preview image directly from that site. Cached locally, never sent to the developer. |
+| Sharing? | Exports are generated locally from the bookmarks already on the page. Nothing is uploaded and there is no share server; data leaves the device only when the user copies the list or saves the .html file. |
 
 Certify:
 
@@ -140,7 +146,7 @@ Certify:
 Plain-language summary to keep the reviewer happy:
 
 ```
-Bookmark Hub processes bookmark titles, URLs, folders and dates locally in the browser to render its single page. The developer has no server and receives no data. Optional page previews fetch the bookmarked page directly from the site that hosts it; those sites see a normal request. Site icons are requested from Google's favicon service unless the user turns that setting off. Settings and the preview cache live in extension local storage on the device.
+Bookmark Hub processes bookmark titles, URLs, folders and dates locally in the browser to render its single page. The developer has no server and receives no data. Sharing builds the link list, Markdown or bookmark file inside the page; nothing is uploaded, and data leaves the device only when the user copies it or saves the file. Optional page previews fetch the bookmarked page directly from the site that hosts it; those sites see a normal request. Site icons are requested from Google's favicon service unless the user turns that setting off. Settings and the preview cache live in extension local storage on the device.
 ```
 
 ## Privacy policy URL
@@ -193,6 +199,7 @@ Bookmark Hub - every bookmark, one searchable page.
 ## Honest notes for the reviewer and for you
 
 - Bookmark URLs are processed only in the browser. There is no backend.
+- Sharing is a local export. It adds no permissions and makes no network request; it only copies text or saves a file when the user asks.
 - With site icons on (the default), each bookmarked domain is sent to `www.google.com/s2/favicons`. The setting is in the page's Settings panel and is labelled plainly. If review pushes back on this, the fastest fix is to ship with site icons off by default; the coloured tiles still work.
 - Preview images are loaded from the site that hosts them, so those sites see a normal image request.
 - Deleting is user-initiated and reversible for 8 seconds. There is no bulk delete and no background modification of bookmarks.

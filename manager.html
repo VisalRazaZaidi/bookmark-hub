@@ -64,6 +64,12 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
         </button>
       </div>
+      <button class="icon-btn" id="selectBtn" aria-label="Select bookmarks" title="Select bookmarks" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>
+      </button>
+      <button class="icon-btn" id="shareBtn" aria-label="Share shown bookmarks" title="Share shown bookmarks">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5.5" r="2.3"/><circle cx="6" cy="12" r="2.3"/><circle cx="18" cy="18.5" r="2.3"/><path d="m8 10.9 7.9-4.2M8 13.1l7.9 4.2"/></svg>
+      </button>
       <button class="icon-btn" id="settingsBtn" aria-label="Settings" aria-expanded="false" aria-controls="settings">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/></svg>
       </button>
@@ -117,6 +123,63 @@
   </div>
 
   <input type="file" id="file" accept=".html,.htm,text/html" hidden>
+
+  <div class="selbar" id="selBar" hidden>
+    <span id="selCount">0 selected</span>
+    <button class="btn ghost" type="button" data-act="select-all">Select all visible</button>
+    <button class="btn" type="button" data-act="share-selected">Share</button>
+    <button class="icon-btn small" type="button" data-act="select-off" aria-label="Exit selection mode">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17"/></svg>
+    </button>
+  </div>
+
+  <div class="share-wrap" id="shareModal" hidden>
+    <div class="share-scrim" id="shareScrim"></div>
+    <div class="share" role="dialog" aria-modal="true" aria-labelledby="shareTitle" aria-describedby="shareSub">
+      <button class="icon-btn small share-x" id="shareX" type="button" aria-label="Close share dialog">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17"/></svg>
+      </button>
+      <h2 id="shareTitle">Share bookmarks</h2>
+      <p class="share-sub" id="shareSub"></p>
+
+      <div class="share-fmts" role="radiogroup" aria-label="Format">
+        <label class="fmt">
+          <input type="radio" name="shareFmt" value="text" checked>
+          <span><b>Link list</b><small>Title — URL, one per line. Paste into chat or email.</small></span>
+        </label>
+        <label class="fmt">
+          <input type="radio" name="shareFmt" value="md">
+          <span><b>Markdown</b><small>A bulleted list for docs, notes or a README.</small></span>
+        </label>
+        <label class="fmt">
+          <input type="radio" name="shareFmt" value="html">
+          <span><b>Bookmark file (.html)</b><small>Any browser can import it. Folder names are kept.</small></span>
+        </label>
+      </div>
+
+      <div class="share-opts">
+        <label><input type="checkbox" id="shareGroup" checked> Group by folder</label>
+        <label><input type="checkbox" id="shareDedupe" checked> Skip duplicate links</label>
+      </div>
+
+      <div class="share-preview">
+        <h3>Preview</h3>
+        <pre id="sharePreview"></pre>
+        <p class="share-file" id="shareFile" hidden></p>
+      </div>
+
+      <p class="share-note">Generated in this tab. Nothing is uploaded.</p>
+
+      <div class="share-actions">
+        <button class="linkish" id="sharePick" type="button">Pick bookmarks individually</button>
+        <span class="grow"></span>
+        <button class="btn ghost" id="shareCancel" type="button">Cancel</button>
+        <button class="btn ghost" id="shareNative" type="button" hidden>Share…</button>
+        <button class="btn" id="shareGo" type="button">Copy list</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast" role="status" aria-live="polite">
     <span id="toastText"></span>
     <button type="button" class="toast-act" id="toastUndo" hidden>Undo</button>
@@ -125,6 +188,7 @@
   <script src="js/store.js"></script>
   <script src="js/data.js"></script>
   <script src="js/previews.js"></script>
+  <script src="js/share.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

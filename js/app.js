@@ -16,6 +16,7 @@
     copy: '<svg viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></svg>',
     trash: '<svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12M10.5 11v5M13.5 11v5"/></svg>',
     open: '<svg viewBox="0 0 24 24"><path d="M14 5h5v5M19 5l-8 8M18 14v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h4"/></svg>',
+    share: '<svg viewBox="0 0 24 24"><circle cx="18" cy="5.5" r="2.3"/><circle cx="6" cy="12" r="2.3"/><circle cx="18" cy="18.5" r="2.3"/><path d="m8 10.9 7.9-4.2M8 13.1l7.9 4.2"/></svg>',
   };
 
   // ---------- State ----------
@@ -33,12 +34,24 @@
   let cur = { si: 0, ii: 0, grid: null };
   let parsed = { terms: [], neg: [], folder: [], site: [] };
   let hlRe = null;
+  let visible = [];
+  let selecting = false;
+  const picked = new Set();
+  let lastPicked = null;
+  let shareState = null;
+  let shareReturn = null;
+  let shareCopiedTimer;
 
   const el = {
     q: $("#q"), clear: $("#clearQ"), search: $(".search"), side: $("#side"), main: $("#main"), head: $("#head"),
     results: $("#results"), banner: $("#banner"), sentinel: $("#sentinel"), settings: $("#settings"),
     toast: $("#toast"), toastText: $("#toastText"), toastUndo: $("#toastUndo"),
     sort: $("#sort"), group: $("#group"), file: $("#file"),
+    shareBtn: $("#shareBtn"), selectBtn: $("#selectBtn"), selBar: $("#selBar"), selCount: $("#selCount"),
+    shareModal: $("#shareModal"), shareTitle: $("#shareTitle"), shareSub: $("#shareSub"),
+    sharePreview: $("#sharePreview"), shareFile: $("#shareFile"), shareGo: $("#shareGo"),
+    shareNative: $("#shareNative"), shareGroup: $("#shareGroup"), shareDedupe: $("#shareDedupe"),
+    sharePick: $("#sharePick"), shareX: $("#shareX"),
   };
 
   // ---------- Helpers ----------
@@ -271,6 +284,7 @@
     const folderName = it.path[it.path.length - 1] || "";
     const isList = S.view === "list";
     return `<article class="card" data-id="${esc(it.id)}" style="--h:${hueOf(it.host)}">
+      <label class="pick" title="Select"><input type="checkbox" data-pick="${esc(it.id)}" aria-label="Select ${esc(title)}"></label>
       <a class="thumb" ${href} tabindex="-1" aria-hidden="true">
         <div class="ph"><span class="fav">${letter}${fav ? `<img src="${esc(fav)}" alt="" referrerpolicy="no-referrer" loading="lazy">` : ""}</span><span class="dom" style="${domStyle(it.host)}">${esc(it.host || "bookmark").replace(/([.\-])/g, "$1<wbr>")}</span></div>
         ${!isList && pv?.i ? `<img class="shot" src="${esc(pv.i)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">` : ""}
@@ -282,6 +296,7 @@
       </div>
       ${it.dups > 1 ? `<span class="dupbadge">${it.dups} copies</span>` : ""}
       <div class="acts">
+        <button class="act" data-act="share-one" aria-label="Share bookmark" title="Share">${ICON.share}</button>
         <button class="act" data-act="copy" aria-label="Copy link" title="Copy link">${ICON.copy}</button>
         ${live ? `<button class="act del" data-act="delete" aria-label="Delete bookmark" title="Delete bookmark">${ICON.trash}</button>` : ""}
       </div>
@@ -321,6 +336,7 @@
       }
       const take = sec.items.slice(cur.ii, cur.ii + left);
       cur.grid.insertAdjacentHTML("beforeend", take.map(cardHtml).join(""));
+      syncPicks(cur.grid);
       observeCards(cur.grid);
       cur.ii += take.length;
       left -= take.length;
@@ -405,6 +421,8 @@
   function renderMain(resetScroll = true) {
     el.results.textContent = "";
     const items = collect();
+    visible = items;
+    updateShareUi();
     renderHead(items.length);
     if (!model.items.length) renderEmpty("empty");
     else if (!items.length) renderEmpty("none");
@@ -481,6 +499,194 @@
     if (S.theme === "auto") delete document.documentElement.dataset.theme;
   }
 
+  // ---------- Sharing (local exports) and selection ----------
+  const shareDateFmt = new Intl.DateTimeFormat(undefined, { day: "numeric", month: "short", year: "numeric" });
+
+  function shareScopeLabel() {
+    const q = S.q.trim();
+    if (q) return `search results for “${q}”`;
+    const title = scopeTitle();
+    if (S.scope.type === "folder") return `folder “${title}”`;
+    if (S.scope.type === "site") return `site ${title}`;
+    return title.toLowerCase();
+  }
+
+  function updateShareUi() {
+    if (!el.shareBtn) return;
+    el.shareBtn.disabled = !visible.length;
+    el.shareBtn.title = visible.length ? "Share shown bookmarks" : "Nothing to share here";
+    if (selecting) { syncPicks(); updateSelBar(); }
+  }
+
+  function syncPicks(root = document) {
+    root.querySelectorAll("input[data-pick]").forEach((box) => {
+      const on = picked.has(box.dataset.pick);
+      box.checked = on;
+      box.closest(".card")?.classList.toggle("picked", on);
+    });
+  }
+
+  function updateSelBar() {
+    if (!el.selBar) return;
+    el.selCount.textContent = picked.size === 1 ? "1 selected" : `${picked.size} selected`;
+    const go = el.selBar.querySelector('[data-act="share-selected"]');
+    if (go) go.disabled = !picked.size;
+  }
+
+  function setSelecting(on) {
+    selecting = on;
+    document.body.classList.toggle("sel-mode", on);
+    el.selBar.hidden = !on;
+    el.selectBtn?.setAttribute("aria-pressed", String(on));
+    if (on) {
+      if (!picked.size) toast("Pick the bookmarks you want to share");
+    } else {
+      picked.clear();
+      lastPicked = null;
+      syncPicks();
+    }
+    updateSelBar();
+  }
+
+  function handlePick(box, shift) {
+    const id = box.dataset.pick;
+    if (shift && lastPicked) {
+      const ids = visible.map((it) => it.id);
+      const a = ids.indexOf(lastPicked);
+      const b = ids.indexOf(id);
+      if (a >= 0 && b >= 0) {
+        const [lo, hi] = a < b ? [a, b] : [b, a];
+        for (let i = lo; i <= hi; i++) {
+          if (box.checked) picked.add(ids[i]); else picked.delete(ids[i]);
+        }
+      }
+    } else if (box.checked) picked.add(id);
+    else picked.delete(id);
+    lastPicked = id;
+    syncPicks();
+    updateSelBar();
+  }
+
+  function openShare(items, label, opts = {}) {
+    if (!items?.length) return;
+    closeSettings();
+    clearTimeout(toastTimer);
+    el.toast.classList.remove("show");
+    shareReturn = document.activeElement;
+    shareState = {
+      items,
+      label,
+      fileLabel: opts.fileLabel || label,
+      fromSelection: !!opts.fromSelection,
+      format: "text",
+      group: items.length > 1,
+      dedupe: true,
+      rootId: opts.rootId || null,
+      rootTitle: opts.rootTitle || `Shared bookmarks — ${shareDateFmt.format(new Date())}`,
+    };
+    el.shareModal.hidden = false;
+    document.body.classList.add("modal-open");
+    el.shareTitle.textContent = `Share ${items.length} ${items.length === 1 ? "bookmark" : "bookmarks"}`;
+    el.shareSub.textContent = `From ${label}`;
+    const radio = el.shareModal.querySelector('input[name="shareFmt"][value="text"]');
+    if (radio) radio.checked = true;
+    el.shareGroup.checked = shareState.group;
+    el.shareDedupe.checked = shareState.dedupe;
+    renderShare();
+    el.shareX.focus();
+  }
+
+  function renderShare() {
+    const s = shareState;
+    if (!s) return;
+    const list = s.dedupe ? BHShare.dedupe(s.items) : s.items;
+    const dropped = s.items.length - list.length;
+    el.shareSub.textContent = `From ${s.label}` + (dropped ? ` · ${dropped} duplicate link${dropped === 1 ? "" : "s"} skipped` : "");
+    const group = s.group && list.length > 1;
+    const opts = { folders: model.folders, group, dedupe: false };
+    const body = s.format === "md" ? BHShare.markdown(list, opts) : BHShare.text(list, opts);
+    const pv = BHShare.preview(body, 3);
+    el.sharePreview.textContent = pv.text + (pv.more ? `\n… ${pv.more} more line${pv.more === 1 ? "" : "s"}` : "");
+    el.shareGroup.disabled = list.length <= 1;
+    el.shareGroup.checked = group;
+    el.shareFile.hidden = s.format !== "html";
+    if (s.format === "html") el.shareFile.textContent = `Saves as ${BHShare.filename(s.fileLabel)}. Folder names are kept.`;
+    el.shareNative.hidden = !(s.format === "text" && BHShare.canNative());
+    el.sharePick.hidden = s.fromSelection;
+    el.shareGo.textContent = s.format === "html" ? "Download .html" : s.format === "md" ? "Copy Markdown" : "Copy list";
+    el.shareGo.disabled = !list.length;
+  }
+
+  function closeShare() {
+    if (!el.shareModal || el.shareModal.hidden) return;
+    el.shareModal.hidden = true;
+    document.body.classList.remove("modal-open");
+    shareState = null;
+    clearTimeout(shareCopiedTimer);
+    if (shareReturn && document.contains(shareReturn)) shareReturn.focus();
+  }
+
+  async function runShare() {
+    const s = shareState;
+    if (!s) return;
+    const list = s.dedupe ? BHShare.dedupe(s.items) : s.items;
+    if (!list.length) { toast("Nothing to share here"); return; }
+    if (s.format === "html") {
+      const html = BHShare.netscape(list, {
+        folders: model.folders, root: s.rootTitle, rootId: s.rootId, dedupe: false,
+      });
+      BHShare.download(BHShare.filename(s.fileLabel), "text/html;charset=utf-8", html);
+      closeShare();
+      toast(`${list.length} bookmark${list.length === 1 ? "" : "s"} saved as a file`);
+      return;
+    }
+    const opts = { folders: model.folders, group: s.group && list.length > 1, dedupe: false };
+    const body = s.format === "md" ? BHShare.markdown(list, opts) : BHShare.text(list, opts);
+    const ok = await BHShare.copy(body);
+    if (!ok) { toast("Couldn't copy — try Download .html"); return; }
+    toast(s.format === "md" ? "Markdown copied" : "Link list copied");
+    el.shareGo.textContent = "Copied";
+    clearTimeout(shareCopiedTimer);
+    shareCopiedTimer = setTimeout(() => {
+      if (shareState && shareState.format === s.format) renderShare();
+    }, 1400);
+  }
+
+  async function runNative() {
+    const s = shareState;
+    if (!s) return;
+    const list = s.dedupe ? BHShare.dedupe(s.items) : s.items;
+    const capped = list.slice(0, 20);
+    const opts = { folders: model.folders, group: s.group && capped.length > 1, dedupe: false };
+    let body = BHShare.text(capped, opts);
+    if (list.length > capped.length) body += `\n… and ${list.length - capped.length} more`;
+    const res = await BHShare.shareNative({ title: s.label, text: body });
+    if (res === "shared") { closeShare(); toast("Shared"); }
+    else if (res === "failed") {
+      const ok = await BHShare.copy(body);
+      toast(ok ? "Couldn't open the share sheet — list copied" : "Couldn't share or copy");
+    }
+  }
+
+  async function shareOne(id) {
+    const it = byId.get(id);
+    if (!it) return;
+    if (BHShare.canNative()) {
+      const res = await BHShare.shareNative({ title: displayTitle(it), url: it.url });
+      if (res === "shared") { toast("Shared"); return; }
+      if (res === "abort") return;
+    }
+    openShare([it], "this bookmark");
+  }
+
+  function openShareFromView() {
+    if (!visible.length) return;
+    const folder = !S.q.trim() && S.scope.type === "folder" ? model.folders.get(S.scope.id) : null;
+    openShare(visible, shareScopeLabel(), folder
+      ? { rootId: folder.id, rootTitle: folder.title, fileLabel: folder.title }
+      : { fileLabel: S.q.trim() ? "search results" : "all bookmarks" });
+  }
+
   // ---------- Actions ----------
   function setScope(type, id) {
     S.scope = id !== undefined ? { type, id } : { type };
@@ -523,12 +729,25 @@
     } else if (act === "copy") {
       const it = byId.get(t.closest(".card").dataset.id);
       try { await navigator.clipboard.writeText(it.url); toast("Link copied"); } catch { toast("Couldn't copy the link"); }
+    } else if (act === "share-one") {
+      shareOne(t.closest(".card").dataset.id);
+    } else if (act === "share-selected") {
+      const items = visible.filter((it) => picked.has(it.id));
+      if (items.length) {
+        openShare(items, `${items.length} selected ${items.length === 1 ? "bookmark" : "bookmarks"}`, { fromSelection: true });
+      }
+    } else if (act === "select-all") {
+      visible.forEach((it) => picked.add(it.id));
+      syncPicks(); updateSelBar();
+    } else if (act === "select-off") {
+      setSelecting(false);
     } else if (act === "delete") {
       const it = byId.get(t.closest(".card").dataset.id);
       if (!it) return;
       const folder = it.path[it.path.length - 1] || "Bookmarks";
       try {
         const node = await BHData.removeBookmark(it.id);
+        if (picked.delete(it.id)) { syncPicks(); updateSelBar(); }
         toastUndoable(
           it.dups > 1
             ? `Deleted this copy. The other copy is still saved in "${folder}".`
@@ -541,6 +760,11 @@
     } else if (act === "pv-enable") enablePreviews();
     else if (act === "pv-dismiss") { S.bannerDismissed = true; persist(); renderBanner(); }
     else if (act === "pv-stop") BHPreviews.stop();
+  });
+
+  document.addEventListener("click", (e) => {
+    const box = e.target.closest("input[data-pick]");
+    if (box) handlePick(box, e.shiftKey);
   });
 
   // Images that fail to load fall back to the coloured tile.
@@ -618,6 +842,40 @@
   });
   $("#menuBtn").addEventListener("click", () => document.body.classList.toggle("nav-open"));
 
+  // ---------- Share dialog and selection controls ----------
+  el.shareBtn.addEventListener("click", openShareFromView);
+  el.selectBtn.addEventListener("click", () => setSelecting(!selecting));
+  el.shareX.addEventListener("click", closeShare);
+  $("#shareScrim").addEventListener("click", closeShare);
+  $("#shareCancel").addEventListener("click", closeShare);
+  el.shareGo.addEventListener("click", runShare);
+  el.shareNative.addEventListener("click", runNative);
+  el.sharePick.addEventListener("click", () => { closeShare(); setSelecting(true); });
+  el.shareModal.querySelectorAll('input[name="shareFmt"]').forEach((r) => r.addEventListener("change", () => {
+    if (!shareState) return;
+    shareState.format = r.value;
+    renderShare();
+  }));
+  el.shareGroup.addEventListener("change", () => {
+    if (!shareState) return;
+    shareState.group = el.shareGroup.checked;
+    renderShare();
+  });
+  el.shareDedupe.addEventListener("change", () => {
+    if (!shareState) return;
+    shareState.dedupe = el.shareDedupe.checked;
+    renderShare();
+  });
+  el.shareModal.addEventListener("keydown", (e) => {
+    if (e.key !== "Tab") return;
+    const f = [...el.shareModal.querySelectorAll("button, input, a[href]")].filter((x) => !x.disabled && x.offsetParent !== null);
+    if (!f.length) return;
+    const first = f[0];
+    const last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+
   // File import (preview mode)
   $("#importBtn").addEventListener("click", () => el.file.click());
   document.addEventListener("click", (e) => { if (e.target.id === "emptyImport") el.file.click(); });
@@ -635,7 +893,13 @@
   document.addEventListener("keydown", (e) => {
     const inField = /^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement?.tagName || "");
     if (e.key === "/" && !inField && !e.ctrlKey && !e.metaKey) { e.preventDefault(); el.q.focus(); el.q.select(); hintsOn(); return; }
-    if (e.key === "Escape") { closeSettings(); document.body.classList.remove("nav-open"); return; }
+    if (e.key === "Escape") {
+      if (!el.shareModal.hidden) { closeShare(); return; }
+      if (selecting) { setSelecting(false); return; }
+      closeSettings();
+      document.body.classList.remove("nav-open");
+      return;
+    }
     const a = document.activeElement;
     if (!a?.classList?.contains("title")) return;
     const arrows = { ArrowRight: [1, 0], ArrowLeft: [-1, 0], ArrowDown: [0, 1], ArrowUp: [0, -1] };

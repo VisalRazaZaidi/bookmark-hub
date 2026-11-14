@@ -5,7 +5,7 @@ Two standalone pages, no build step:
 ```
 site/
   index.html      landing page with a working search demo
-  privacy.html    privacy policy (effective 13 November 2026)
+  privacy.html    privacy policy (effective 14 November 2026)
   assets/
     icon-32.png   favicon
     icon-128.png  larger icon
