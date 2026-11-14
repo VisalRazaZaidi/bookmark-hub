@@ -1,0 +1,1140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Bookmark Hub — find any bookmark in seconds</title>
+<meta name="description" content="Bookmark Hub puts every browser bookmark on one fast, visual page: real folders, page previews and search that understands site: and folder:.">
+<link rel="canonical" href="https://visalrazazaidi.github.io/bookmark-hub/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Bookmark Hub — find any bookmark in seconds">
+<meta property="og:description" content="Every browser bookmark on one fast, visual page: real folders, page previews and search that understands site: and folder:.">
+<meta property="og:url" content="https://visalrazazaidi.github.io/bookmark-hub/">
+<link rel="icon" href="assets/icon-32.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400..700&display=swap">
+<style>
+  /* ---------- Tokens ---------- */
+  :root {
+    color-scheme: light dark;
+    --paper: #e9edf3;
+    --panel: #f4f6fa;
+    --card: #ffffff;
+    --ink: #0e1830;
+    --mute: #586178;
+    --line: #d5dbe6;
+    --accent: #3140ee;
+    --accent-ink: #ffffff;
+    --accent-soft: #dfe4ff;
+    --hl: #ffe26b;
+    --hl-ink: #1d1700;
+    --danger: #c4262e;
+    --shadow: 0 34px 70px -34px rgb(14 24 48 / .38);
+    --shadow-soft: 0 18px 40px -24px rgb(14 24 48 / .3);
+    --display: "Bricolage Grotesque", "Inter", system-ui, sans-serif;
+    --body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --wrap: 1160px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0b101d;
+      --panel: #0f1626;
+      --card: #151d31;
+      --ink: #e9edf8;
+      --mute: #8f9bb6;
+      --line: #232d47;
+      --accent: #93a2ff;
+      --accent-ink: #0b101d;
+      --accent-soft: #1c2850;
+      --danger: #ff8d93;
+      --shadow: 0 34px 70px -34px rgb(0 0 0 / .65);
+      --shadow-soft: 0 18px 40px -24px rgb(0 0 0 / .55);
+    }
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --paper: #e9edf3; --panel: #f4f6fa; --card: #fff; --ink: #0e1830; --mute: #586178;
+    --line: #d5dbe6; --accent: #3140ee; --accent-ink: #fff; --accent-soft: #dfe4ff;
+    --danger: #c4262e; --shadow: 0 34px 70px -34px rgb(14 24 48 / .38);
+    --shadow-soft: 0 18px 40px -24px rgb(14 24 48 / .3);
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper: #0b101d; --panel: #0f1626; --card: #151d31; --ink: #e9edf8; --mute: #8f9bb6;
+    --line: #232d47; --accent: #93a2ff; --accent-ink: #0b101d; --accent-soft: #1c2850;
+    --danger: #ff8d93; --shadow: 0 34px 70px -34px rgb(0 0 0 / .65);
+    --shadow-soft: 0 18px 40px -24px rgb(0 0 0 / .55);
+  }
+
+  /* ---------- Base ---------- */
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font: 400 16px/1.6 var(--body);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  h1, h2, h3, p, figure { margin: 0; }
+  a { color: inherit; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+  img, svg { display: block; max-width: 100%; }
+  .wrap { width: min(var(--wrap), calc(100% - 48px)); margin-inline: auto; }
+  .skip {
+    position: absolute; left: 16px; top: -60px; z-index: 100;
+    background: var(--accent); color: var(--accent-ink); padding: 10px 16px; border-radius: 8px;
+    font-weight: 600; text-decoration: none;
+  }
+  .skip:focus { top: 12px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+  /* ---------- Header ---------- */
+  .site-head {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .head-in { display: flex; align-items: center; gap: 28px; height: 68px; }
+  .brand {
+    display: inline-flex; align-items: center; gap: 10px; text-decoration: none; flex: none;
+    font: 800 19px/1 var(--display); letter-spacing: -.02em;
+  }
+  .brand svg { width: 30px; height: 30px; }
+  .nav { display: flex; gap: 26px; margin-left: 12px; font-size: 14.5px; font-weight: 500; }
+  .nav a { text-decoration: none; color: var(--mute); }
+  .nav a:hover { color: var(--ink); }
+  .head-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 42px; padding: 0 18px; border-radius: 10px; border: 1px solid transparent;
+    background: var(--accent); color: var(--accent-ink);
+    font-weight: 650; font-size: 14.5px; text-decoration: none;
+    transition: transform .12s ease, filter .15s ease, border-color .15s;
+  }
+  .btn:hover { filter: brightness(1.06); }
+  .btn:active { transform: translateY(1px); }
+  .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+  .btn.ghost:hover { border-color: var(--accent); filter: none; }
+  .btn.small { min-height: 36px; padding: 0 14px; font-size: 13.5px; }
+  .theme-btn {
+    display: grid; place-items: center; width: 38px; height: 38px; border-radius: 9px;
+    border: 1px solid var(--line); background: var(--card); color: var(--mute);
+  }
+  .theme-btn:hover { color: var(--ink); border-color: var(--accent); }
+  .theme-btn svg { width: 17px; height: 17px; }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 66px 0 36px; }
+  .hero-in { display: grid; grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr); gap: 68px; align-items: center; }
+  .hero h1 {
+    font: 800 clamp(42px, 5.2vw, 68px)/0.98 var(--display);
+    letter-spacing: -.045em;
+    text-wrap: balance;
+  }
+  .hero h1 .mark { position: relative; white-space: nowrap; }
+  .hero h1 .mark::after {
+    content: ""; position: absolute; left: -2px; right: -2px; bottom: .06em; height: .3em;
+    background: var(--hl); z-index: -1; border-radius: 3px; transform: rotate(-1deg);
+  }
+  .hero .lead { margin-top: 22px; max-width: 48ch; font-size: 18px; line-height: 1.55; color: var(--mute); }
+  .hero .lead strong { color: var(--ink); font-weight: 600; }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+  .hero-note { margin-top: 14px; font-size: 13.5px; color: var(--mute); }
+  .hero-note span + span::before { content: "·"; margin: 0 8px; opacity: .7; }
+
+  /* ---------- Demo window ---------- */
+  .demo {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    font-size: 13px;
+  }
+  .demo-bar { display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 14px; background: var(--panel); border-bottom: 1px solid var(--line); }
+  .dots { display: flex; gap: 6px; }
+  .dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+  .dots i:first-child { background: #e2685f; }
+  .dots i:nth-child(2) { background: #e8b53d; }
+  .dots i:nth-child(3) { background: #57b36b; }
+  .demo-url {
+    flex: 1; max-width: 330px; margin-inline: auto; height: 24px; display: flex; align-items: center; justify-content: center;
+    border-radius: 6px; background: var(--card); border: 1px solid var(--line);
+    font-size: 11.5px; color: var(--mute); overflow: hidden; white-space: nowrap;
+  }
+  .demo-body { display: grid; grid-template-columns: 166px minmax(0, 1fr); min-height: 470px; }
+  .demo-side { background: var(--panel); border-right: 1px solid var(--line); padding: 12px 6px; overflow: hidden; }
+  .demo-side h4 { margin: 0 8px 6px; font: 600 10.5px/1.4 var(--body); color: var(--mute); letter-spacing: .01em; }
+  .demo-side h4.gap { margin-top: 14px; }
+  .side-row { display: flex; align-items: center; gap: 6px; padding: 5px 8px; border-radius: 7px; color: var(--ink); font-size: 11px; white-space: nowrap; overflow: hidden; }
+  .side-row svg { width: 13px; height: 13px; flex: none; color: var(--mute); }
+  .side-row b { margin-left: auto; font-weight: 500; color: var(--mute); font-size: 10.5px; font-variant-numeric: tabular-nums; }
+  .side-row.on { background: var(--accent-soft); font-weight: 600; }
+  .side-row.on svg, .side-row.on b { color: var(--accent); }
+  .side-row.indent { padding-left: 22px; }
+  .demo-main { min-width: 0; padding: 12px 14px 14px; }
+  .demo-search { position: relative; display: flex; align-items: center; height: 38px; border: 1.5px solid var(--line); border-radius: 11px; background: var(--card); padding: 0 10px; }
+  .demo-search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent); }
+  .demo-search svg { width: 16px; height: 16px; flex: none; color: var(--mute); }
+  .demo-search input { flex: 1; min-width: 0; border: 0; background: none; outline: 0; padding: 0 8px; font: 500 13px var(--body); color: var(--ink); }
+  .demo-search input::placeholder { color: var(--mute); font-weight: 400; }
+  .demo-search kbd { font: 600 10px/1 var(--body); color: var(--mute); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 3px 5px; }
+  .demo-search .clear { border: 0; background: none; color: var(--mute); padding: 4px; font-size: 12px; font-weight: 600; }
+  .demo-search .clear:hover { color: var(--accent); }
+  .demo-chips { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 9px 0 8px; font-size: 11.5px; color: var(--mute); }
+  .demo-chips button { border: 1px solid var(--line); background: var(--panel); color: var(--mute); border-radius: 6px; padding: 2px 7px; font-size: 11.5px; }
+  .demo-chips button:hover { border-color: var(--accent); color: var(--accent); }
+  .demo-count { font-size: 11.5px; color: var(--mute); margin-bottom: 8px; font-variant-numeric: tabular-nums; }
+  .demo-count b { color: var(--ink); font-weight: 600; }
+  .demo-results {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(138px, 1fr)); gap: 10px;
+    max-height: 316px; overflow: auto; padding: 1px 2px 2px; scrollbar-width: thin;
+  }
+  .demo-results::-webkit-scrollbar { width: 8px; }
+  .demo-results::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+  .d-card { background: var(--card); border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+  .d-thumb { aspect-ratio: 16 / 10; background: var(--panel); border-bottom: 1px solid var(--line); }
+  .d-thumb svg { width: 100%; height: 100%; }
+  .d-body { padding: 7px 8px 8px; display: flex; flex-direction: column; gap: 5px; }
+  .d-title { font-size: 11.5px; font-weight: 600; line-height: 1.3; text-decoration: none; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+  .d-title:hover { color: var(--accent); }
+  .d-title.untitled { color: var(--mute); font-weight: 500; }
+  .d-meta { display: flex; align-items: center; gap: 5px; color: var(--mute); font-size: 10.5px; min-width: 0; }
+  .d-fav { width: 13px; height: 13px; border-radius: 3px; flex: none; display: grid; place-items: center; background: hsl(var(--h) 62% 52%); color: #fff; font: 800 8px/1 var(--display); }
+  .d-host { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  .d-date { margin-left: auto; flex: none; }
+  .d-chip { align-self: flex-start; border: 1px solid var(--line); background: var(--panel); border-radius: 4px; padding: 0 5px; font-size: 10px; color: var(--mute); }
+  mark { background: var(--hl); color: var(--hl-ink); border-radius: 3px; padding: 0 1px; }
+  .demo-empty { grid-column: 1 / -1; padding: 34px 18px; text-align: center; color: var(--mute); font-size: 12.5px; border: 1px dashed var(--line); border-radius: 10px; }
+  .demo-empty button { margin-top: 10px; border: 1px solid var(--line); background: var(--panel); border-radius: 7px; padding: 5px 10px; font-size: 12px; }
+
+  /* ---------- Sections ---------- */
+  .section { padding: 84px 0; }
+  .section.tight { padding: 64px 0; }
+  .sect-head { max-width: 62ch; margin-bottom: 40px; }
+  .sect-head h2 {
+    font: 800 clamp(30px, 3.7vw, 46px)/1.03 var(--display);
+    letter-spacing: -.035em; text-wrap: balance;
+  }
+  .sect-head p { margin-top: 14px; font-size: 17.5px; line-height: 1.6; color: var(--mute); }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+  .split.rev .copy { order: 2; }
+  .copy h2 { font: 800 clamp(28px, 3.2vw, 40px)/1.05 var(--display); letter-spacing: -.03em; text-wrap: balance; }
+  .copy > p { margin-top: 16px; color: var(--mute); font-size: 16.5px; line-height: 1.65; max-width: 52ch; }
+  .copy > p strong { color: var(--ink); font-weight: 600; }
+  .points { list-style: none; padding: 0; margin: 24px 0 0; display: grid; gap: 13px; }
+  .points li { display: flex; gap: 11px; font-size: 15px; line-height: 1.5; }
+  .points b { font-weight: 600; }
+  .points .tick {
+    flex: none; width: 20px; height: 20px; margin-top: 2px; border-radius: 6px;
+    display: grid; place-items: center; background: var(--accent-soft); color: var(--accent);
+  }
+  .points .tick svg { width: 12px; height: 12px; }
+
+  /* mock frames */
+  .frame {
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden;
+    box-shadow: var(--shadow-soft);
+  }
+  .frame-bar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--line); background: var(--panel); font-size: 12px; font-weight: 600; color: var(--mute); }
+  .frame-bar .dots i { width: 8px; height: 8px; }
+  .frame-bar .tag { margin-left: auto; font-weight: 500; color: var(--mute); }
+  .tree { padding: 12px; display: grid; gap: 2px; }
+  .tree-row { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 7px; font-size: 13px; }
+  .tree-row svg { width: 15px; height: 15px; color: var(--mute); flex: none; }
+  .tree-row b { margin-left: auto; font-weight: 500; color: var(--mute); font-size: 12px; }
+  .tree-row.on { background: var(--accent-soft); font-weight: 600; }
+  .tree-row.on svg, .tree-row.on b { color: var(--accent); }
+  .tree-row.l2 { padding-left: 28px; }
+  .tree-row.l3 { padding-left: 46px; }
+  .group-peek { padding: 14px; border-top: 1px solid var(--line); }
+  .group-peek h4 { display: flex; align-items: baseline; gap: 8px; font: 700 14px var(--display); margin-bottom: 10px; }
+  .group-peek h4 span { margin-left: auto; font: 500 11.5px var(--body); color: var(--mute); }
+  .peek-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .peek-cards .d-title { font-size: 10.5px; }
+  .peek-cards .d-body { gap: 4px; padding: 6px; }
+  .peek-cards .d-chip { display: none; }
+  .peek-cards .d-date { display: none; }
+
+  /* preview comparison */
+  .preview-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .preview-item figure { background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow-soft); }
+  .preview-item figure > svg { width: 100%; height: auto; aspect-ratio: 16/10; }
+  .preview-item .fallback {
+    aspect-ratio: 16/10; display: flex; flex-direction: column; justify-content: space-between; padding: 16px;
+    background: linear-gradient(145deg, hsl(232 70% 56%), hsl(274 66% 40%)); color: #fff;
+  }
+  .fallback .badge { width: 38px; height: 38px; border-radius: 10px; background: rgb(255 255 255 / .94); color: #2b2f7a; display: grid; place-items: center; font: 800 18px var(--display); }
+  .fallback .dom { font: 800 clamp(20px, 2.5vw, 30px)/.98 var(--display); letter-spacing: -.035em; }
+  .preview-item figcaption { margin-top: 10px; font-size: 13px; color: var(--mute); text-align: center; }
+  .preview-item figcaption b { color: var(--ink); font-weight: 600; }
+
+  /* search panel */
+  .search-panel {
+    background: #0e1830; color: #e9edf3;
+    border-radius: 22px; padding: 44px; margin-top: 8px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;
+  }
+  .search-panel h2 { font: 800 clamp(28px, 3.4vw, 42px)/1.05 var(--display); letter-spacing: -.035em; }
+  .search-panel p { margin-top: 14px; color: #aab4cc; line-height: 1.6; }
+  .search-panel p code {
+    font: 600 13px/1 ui-monospace, "SF Mono", Consolas, monospace;
+    background: rgb(255 255 255 / .09); color: var(--hl); padding: 2px 5px; border-radius: 4px;
+  }
+  .search-panel .fake-search {
+    display: flex; align-items: center; gap: 9px; height: 46px; padding: 0 14px; margin-top: 24px;
+    border-radius: 12px; background: rgb(255 255 255 / .07);
+    border: 1px solid rgb(255 255 255 / .18); font-size: 14.5px;
+  }
+  .search-panel .fake-search svg { width: 17px; height: 17px; color: #8f9bb6; }
+  .search-panel .fake-search code { color: var(--hl); font: 600 14px/1 ui-monospace, "SF Mono", Consolas, monospace; }
+  .search-panel .fake-search span { color: #9aa6c2; }
+  .ops { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .ops th { text-align: left; font: 600 11.5px/1 var(--body); letter-spacing: .04em; text-transform: uppercase; color: #8f9bb6; padding: 0 0 10px; }
+  .ops td { padding: 11px 0; border-top: 1px solid rgb(255 255 255 / .14); vertical-align: top; }
+  .ops td:first-child { width: 47%; padding-right: 16px; }
+  .ops code {
+    font: 600 13px/1.4 ui-monospace, "SF Mono", Consolas, monospace;
+    background: rgb(255 255 255 / .09); color: var(--hl);
+    padding: 3px 7px; border-radius: 5px; white-space: nowrap;
+  }
+  .ops td:last-child { color: #c3cbe0; }
+  .keys { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
+  .keys span { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: #aab4cc; }
+  .keys kbd {
+    font: 600 11px/1 var(--body); color: #e9edf3;
+    border: 1px solid rgb(255 255 255 / .26); border-bottom-width: 2px;
+    border-radius: 5px; padding: 4px 7px; background: rgb(255 255 255 / .06);
+  }
+
+  /* duplicates demo */
+  .tidy-frame { position: relative; padding: 18px; }
+  .dup-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; }
+  .dup-head h3 { font: 700 18px/1.2 var(--display); letter-spacing: -.02em; }
+  .dup-head span { font-size: 12.5px; color: var(--mute); }
+  .dup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .dup-grid .d-card { position: relative; transition: opacity .2s, transform .2s; }
+  .dup-grid .d-card .d-body { padding: 10px 11px 11px; }
+  .dup-grid .d-title { font-size: 13.5px; }
+  .dup-grid .d-meta { font-size: 11.5px; }
+  .dup-badge {
+    position: absolute; top: 8px; left: 8px; z-index: 2;
+    background: var(--hl); color: var(--hl-ink); font-size: 10.5px; font-weight: 700;
+    border-radius: 5px; padding: 2px 6px;
+  }
+  .del-btn {
+    position: absolute; top: 8px; right: 8px; z-index: 2; width: 28px; height: 28px;
+    display: grid; place-items: center; border: 0; border-radius: 7px;
+    background: rgb(14 24 48 / .82); color: #fff;
+  }
+  .del-btn svg { width: 14px; height: 14px; }
+  .del-btn:hover { background: var(--danger); }
+  .del-btn[disabled] { opacity: 0; pointer-events: none; }
+  .dup-grid .d-card.hidden { opacity: 0; transform: scale(.97); pointer-events: none; }
+  .tidy-toast {
+    display: flex; align-items: center; gap: 12px; margin-top: 16px; padding: 10px 12px;
+    background: var(--ink); color: var(--paper); border-radius: 9px; font-size: 12.5px; line-height: 1.4;
+    min-height: 46px;
+  }
+  .tidy-toast[data-hidden="true"] { visibility: hidden; }
+  .tidy-toast p { flex: 1; }
+  .tidy-toast button {
+    flex: none; border: 1px solid color-mix(in srgb, currentColor 35%, transparent); background: none;
+    color: inherit; font-weight: 700; font-size: 12px; padding: 4px 10px; border-radius: 6px;
+  }
+  .tidy-toast button:hover { background: color-mix(in srgb, currentColor 16%, transparent); }
+  .tidy-toast button[hidden] { display: none; }
+
+  /* privacy */
+  .privacy-band { background: var(--panel); border-block: 1px solid var(--line); }
+  .privacy-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 34px; }
+  .privacy-grid article { padding: 26px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; }
+  .privacy-grid h3 { font: 700 17px/1.25 var(--display); letter-spacing: -.01em; }
+  .privacy-grid p { margin-top: 8px; font-size: 14.5px; line-height: 1.6; color: var(--mute); }
+  .privacy-grid a { color: var(--accent); font-weight: 600; text-decoration: none; }
+  .privacy-grid a:hover { text-decoration: underline; }
+  .privacy-note { margin-top: 26px; font-size: 14px; color: var(--mute); }
+  .privacy-note a { color: var(--accent); font-weight: 600; text-decoration: none; }
+  .privacy-note a:hover { text-decoration: underline; }
+
+  /* install */
+  .install-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 60px; align-items: start; }
+  .steps { list-style: none; margin: 0; padding: 0; counter-reset: step; display: grid; gap: 22px; }
+  .steps li { display: grid; grid-template-columns: 34px 1fr; gap: 14px; counter-increment: step; }
+  .steps li::before {
+    content: counter(step); width: 34px; height: 34px; border-radius: 10px;
+    background: var(--accent); color: var(--accent-ink);
+    display: grid; place-items: center; font: 700 15px/1 var(--display);
+  }
+  .steps h3 { font: 650 16px/1.4 var(--body); }
+  .steps p { color: var(--mute); font-size: 14.5px; margin-top: 2px; }
+  .install-card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 28px;
+    box-shadow: var(--shadow-soft);
+  }
+  .install-card .big-logo { width: 54px; height: 54px; }
+  .install-card h3 { margin-top: 16px; font: 800 26px/1.1 var(--display); letter-spacing: -.03em; }
+  .install-card p { margin-top: 8px; color: var(--mute); font-size: 14.5px; }
+  .install-card .btn { width: 100%; margin-top: 18px; }
+  .install-card small { display: block; margin-top: 12px; font-size: 12.5px; color: var(--mute); text-align: center; }
+  .browser-note { margin-top: 16px; font-size: 13px; color: var(--mute); text-align: center; }
+
+  /* faq */
+  .faq-wrap { max-width: 820px; }
+  .faq { border-top: 1px solid var(--line); }
+  .faq details { border-bottom: 1px solid var(--line); }
+  .faq summary {
+    list-style: none; cursor: pointer; padding: 20px 40px 20px 0; position: relative;
+    font: 600 16.5px/1.45 var(--body);
+  }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after {
+    content: "+"; position: absolute; right: 2px; top: 50%; translate: 0 -50%;
+    font: 400 24px/1 var(--display); color: var(--mute);
+  }
+  .faq details[open] summary::after { content: "–"; }
+  .faq details p { padding: 0 40px 20px 0; color: var(--mute); font-size: 15px; line-height: 1.65; }
+  .faq details a { color: var(--accent); font-weight: 600; text-decoration: none; }
+
+  /* footer */
+  .site-foot { border-top: 1px solid var(--line); padding: 40px 0 48px; }
+  .foot-in { display: flex; flex-wrap: wrap; align-items: center; gap: 22px; }
+  .foot-in .brand { font-size: 17px; }
+  .foot-links { margin-left: auto; display: flex; flex-wrap: wrap; gap: 22px; font-size: 14px; }
+  .foot-links a { color: var(--mute); text-decoration: none; }
+  .foot-links a:hover { color: var(--ink); }
+  .foot-note { flex-basis: 100%; font-size: 13px; color: var(--mute); margin-top: 6px; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1020px) {
+    .hero-in { grid-template-columns: 1fr; gap: 44px; }
+    .hero { padding-top: 52px; }
+    .hero .lead { max-width: 62ch; }
+    .demo { max-width: 720px; }
+    .split, .install-grid { grid-template-columns: 1fr; gap: 40px; }
+    .split.rev .copy { order: 0; }
+    .search-panel { grid-template-columns: 1fr; gap: 34px; padding: 34px; }
+    .privacy-grid { grid-template-columns: 1fr; gap: 14px; }
+    .preview-compare { max-width: 640px; }
+    .nav { display: none; }
+  }
+  @media (max-width: 720px) {
+    .wrap { width: calc(100% - 32px); }
+    .section { padding: 60px 0; }
+    .head-actions .btn span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    .head-actions .btn { width: 40px; min-height: 40px; padding: 0; }
+    .demo-body { grid-template-columns: 1fr; min-height: 0; }
+    .demo-side { display: none; }
+    .demo-results { max-height: 372px; }
+    .search-panel { border-radius: 16px; padding: 26px 22px; }
+    .preview-compare { gap: 12px; }
+    .dup-grid { grid-template-columns: 1fr; }
+    .tidy-frame { padding: 14px; }
+    .site-foot .foot-in { gap: 14px; }
+    .foot-links { margin-left: 0; }
+  }
+  @media (max-width: 460px) {
+    .hero h1 { font-size: 40px; }
+    .hero .lead { font-size: 16.5px; }
+    .demo-main { padding: 10px 10px 12px; }
+    .demo-results { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .demo-search input { font-size: 12.5px; }
+    .demo-chips button { font-size: 11px; }
+    .peek-cards { grid-template-columns: 1fr 1fr; }
+    .peek-cards .d-card:nth-child(3) { display: none; }
+    .ops td:first-child { width: 55%; }
+    .steps li { grid-template-columns: 30px 1fr; }
+    .steps li::before { width: 30px; height: 30px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-head">
+  <div class="wrap head-in">
+    <a class="brand" href="index.html" aria-label="Bookmark Hub home">
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <rect width="32" height="32" rx="9" fill="var(--accent)"/>
+        <path d="M10.5 7h11a1.5 1.5 0 0 1 1.5 1.5V25l-7-4.6L9 25V8.5A1.5 1.5 0 0 1 10.5 7z" fill="var(--accent-ink)"/>
+      </svg>
+      <span>Bookmark Hub</span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="#folders">Folders</a>
+      <a href="#search">Search</a>
+      <a href="#tidy">Tidy up</a>
+      <a href="#privacy">Privacy</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="head-actions">
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="Change theme" title="Change theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.2 5.2l1.4 1.4M17.4 17.4l1.4 1.4M5.2 18.8l1.4-1.4M17.4 6.6l1.4-1.4"/>
+        </svg>
+      </button>
+      <a class="btn js-store" href="#install">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>
+        <span>Add to Chrome</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <!-- Hero -->
+  <section class="hero">
+    <div class="wrap hero-in">
+      <div>
+        <h1>Find any bookmark <span class="mark">in seconds.</span></h1>
+        <p class="lead">Bookmark Hub turns the browser's bookmark list into a page you can actually browse. <strong>Real folders, page previews and search that understands what you remember.</strong></p>
+        <div class="hero-cta">
+          <a class="btn js-store" href="#install">Add to Chrome</a>
+          <a class="btn ghost" href="#search">See how search works</a>
+        </div>
+        <p class="hero-note"><span>Free</span><span>No account</span><span>Chrome, Edge and Brave</span></p>
+      </div>
+
+      <div class="demo" aria-label="Interactive demo of the Bookmark Hub page">
+        <div class="demo-bar">
+          <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="demo-url">bookmark-hub / manager.html</span>
+        </div>
+        <div class="demo-body">
+          <aside class="demo-side" aria-hidden="true">
+            <h4>Bookmarks</h4>
+            <div class="side-row on">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4.5h10a1 1 0 0 1 1 1V20l-6-3.8L6 20V5.5a1 1 0 0 1 1-1z"/></svg>
+              All bookmarks <b>28</b>
+            </div>
+            <div class="side-row">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></svg>
+              Recently added <b>28</b>
+            </div>
+            <div class="side-row">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></svg>
+              Duplicates <b>3</b>
+            </div>
+            <div class="side-row">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7V5h14v2M12 5v14M9 19h6"/></svg>
+              Missing titles <b>2</b>
+            </div>
+            <h4 class="gap">Folders</h4>
+            <div class="side-row indent">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2.5h7a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>
+              Code <b>6</b>
+            </div>
+            <div class="side-row indent">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2.5h7a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>
+              Design <b>6</b>
+            </div>
+            <div class="side-row indent">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2.5h7a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>
+              Docs <b>3</b>
+            </div>
+            <div class="side-row indent">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2.5h7a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>
+              Recipes <b>3</b>
+            </div>
+            <div class="side-row indent">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2.5h7a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>
+              Reading <b>4</b>
+            </div>
+            <div class="side-row indent">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2.5h7a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>
+              Work <b>4</b>
+            </div>
+            <div class="side-row indent">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2.5h7a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>
+              Music <b>2</b>
+            </div>
+          </aside>
+
+          <div class="demo-main">
+            <div class="demo-search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+              <input id="demoQ" type="search" autocomplete="off" spellcheck="false" placeholder="Search by title, site or folder" aria-label="Search the demo bookmarks">
+              <kbd aria-hidden="true">/</kbd>
+              <button class="clear" id="demoClear" type="button" hidden>Clear</button>
+            </div>
+            <div class="demo-chips">
+              <span>Try</span>
+              <button type="button" data-try="docs">docs</button>
+              <button type="button" data-try="figma">figma</button>
+              <button type="button" data-try="recipe">recipe</button>
+              <button type="button" data-try="site:github.com">site:github.com</button>
+            </div>
+            <p class="demo-count" id="demoCount" aria-live="polite">28 bookmarks</p>
+            <div class="demo-results" id="demoResults"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Folders -->
+  <section class="section" id="folders">
+    <div class="wrap split">
+      <div class="copy">
+        <h2>Your folders were always there. Now you can see them.</h2>
+        <p>The sidebar mirrors your real folder tree, with counts that include everything inside. Nothing is moved or reorganised: Bookmark Hub reads the structure your browser already has.</p>
+        <ul class="points">
+          <li><span class="tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><span><b>Recently added</b> puts the latest 60 bookmarks one click away.</span></li>
+          <li><span class="tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><span><b>Top sites</b> shows the domains you save most.</span></li>
+          <li><span class="tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><span><b>Group and sort</b> by folder, site or month added; newest, oldest or A to Z.</span></li>
+        </ul>
+      </div>
+
+      <div class="frame" aria-hidden="true">
+        <div class="frame-bar"><span class="dots"><i></i><i></i><i></i></span> Folders <span class="tag">real tree, live counts</span></div>
+        <div class="tree">
+          <div class="tree-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2.5h7a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg> Bookmarks bar <b>19</b></div>
+          <div class="tree-row l2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2.5h7a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg> Design <b>6</b></div>
+          <div class="tree-row l3 on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2.5h7a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg> Recipes <b>3</b></div>
+          <div class="tree-row l3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2.5h7a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg> Code <b>6</b></div>
+          <div class="tree-row l2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2.5h7a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg> Reading <b>4</b></div>
+          <div class="tree-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2.5h7a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg> Other bookmarks <b>9</b></div>
+        </div>
+        <div class="group-peek">
+          <h4>Recipes <span>3 bookmarks</span></h4>
+          <div class="peek-cards">
+            <article class="d-card"><div class="d-thumb" data-wire="kingarthurbaking.com"></div><div class="d-body"><p class="d-title">The best sourdough starter recipe</p><div class="d-meta"><span class="d-host">kingarthurbaking.com</span></div></div></article>
+            <article class="d-card"><div class="d-thumb" data-wire="smittenkitchen.com"></div><div class="d-body"><p class="d-title">Braised chickpeas with yogurt</p><div class="d-meta"><span class="d-host">smittenkitchen.com</span></div></div></article>
+            <article class="d-card"><div class="d-thumb" data-wire="seriouseats.com"></div><div class="d-body"><p class="d-title">Halal cart-style chicken</p><div class="d-meta"><span class="d-host">seriouseats.com</span></div></div></article>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Previews -->
+  <section class="section tight">
+    <div class="wrap split rev">
+      <div class="copy">
+        <h2>Recognise the page before you open it.</h2>
+        <p>With previews on, each card shows the page's own preview image and real title. Pages without one get a tile built from the domain, so no card is ever a blank rectangle.</p>
+        <ul class="points">
+          <li><span class="tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><span><b>Optional and local.</b> Previews are fetched straight from the site and cached in your browser.</span></li>
+          <li><span class="tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><span><b>Names for untitled bookmarks.</b> Missing titles are filled from the page itself.</span></li>
+          <li><span class="tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><span><b>Turn it off any time.</b> Clearing the cache or revoking the permission takes one click.</span></li>
+        </ul>
+      </div>
+      <div class="preview-compare" aria-hidden="true">
+        <figure class="preview-item">
+          <div data-wire="figma.com"></div>
+          <figcaption><b>With previews.</b> The page's own image.</figcaption>
+        </figure>
+        <figure class="preview-item">
+          <div class="fallback">
+            <span class="badge">G</span>
+            <span class="dom">github.com</span>
+          </div>
+          <figcaption><b>Without.</b> A tile from the domain.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- Search -->
+  <section class="section" id="search">
+    <div class="wrap">
+      <div class="search-panel">
+        <div>
+          <h2>Type what you remember. It finds the rest.</h2>
+          <p>Every word has to match, and results are ranked by where the match was found: title first, then site, then folder path. Press <code>/</code> to jump to search and <code>Enter</code> to open the top result.</p>
+          <div class="fake-search" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+            <code>site:github.com</code> <span>react hooks</span>
+            <span style="margin-left:auto">7 results</span>
+          </div>
+          <div class="keys">
+            <span><kbd>/</kbd> search</span>
+            <span><kbd>Enter</kbd> open top result</span>
+            <span><kbd>↑</kbd><kbd>↓</kbd> move between cards</span>
+            <span><kbd>Esc</kbd> clear</span>
+            <span><kbd>Alt</kbd> + <kbd>B</kbd> open Bookmark Hub</span>
+          </div>
+        </div>
+        <div>
+          <table class="ops">
+            <thead><tr><th scope="col">What you type</th><th scope="col">What it does</th></tr></thead>
+            <tbody>
+              <tr><td><code>site:github.com</code></td><td>Only bookmarks from that site.</td></tr>
+              <tr><td><code>folder:recipes</code></td><td>Only bookmarks inside that folder. <code>in:</code> works too.</td></tr>
+              <tr><td><code>"sourdough starter"</code></td><td>An exact phrase, not two separate words.</td></tr>
+              <tr><td><code>-youtube</code></td><td>Leave out a word or site.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tidy up -->
+  <section class="section tight" id="tidy">
+    <div class="wrap split">
+      <div class="copy">
+        <h2>Clean up without holding your breath.</h2>
+        <p><b>Duplicates</b> counts the extra copies of the same link. <b>Missing titles</b> lists the bookmarks saved without a name. Delete removes exactly the copy you clicked, not every matching URL.</p>
+        <p style="margin-top:12px">If you change your mind, <b>Undo</b> puts it back in the same folder and position for eight seconds.</p>
+        <a class="btn ghost" href="#install" style="margin-top:24px">Get Bookmark Hub</a>
+      </div>
+
+      <div class="frame tidy-frame">
+        <div class="dup-head"><h3>Duplicates</h3><span>3 extra copies across 3 links</span></div>
+        <div class="dup-grid" id="dupGrid">
+          <article class="d-card">
+            <div class="d-thumb" data-wire="figma.com"></div>
+            <div class="d-body">
+              <p class="d-title">Figma: the collaborative interface design tool</p>
+              <div class="d-meta"><span class="d-fav" style="--h:262">F</span><span class="d-host">figma.com</span><span class="d-date">3 Nov</span></div>
+              <span class="d-chip">Design</span>
+            </div>
+          </article>
+          <article class="d-card" id="dupCopy">
+            <span class="dup-badge">2 copies</span>
+            <button class="del-btn" id="dupDelete" type="button" aria-label="Delete this copy (demo)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12M10.5 11v5M13.5 11v5"/></svg>
+            </button>
+            <div class="d-thumb" data-wire="figma.com"></div>
+            <div class="d-body">
+              <p class="d-title">Figma: the collaborative interface design tool</p>
+              <div class="d-meta"><span class="d-fav" style="--h:262">F</span><span class="d-host">figma.com</span><span class="d-date">12 Aug</span></div>
+              <span class="d-chip">Design</span>
+            </div>
+          </article>
+        </div>
+        <div class="tidy-toast" id="tidyToast" data-hidden="true" role="status" aria-live="polite">
+          <p id="tidyText">Deleted this copy. The other copy is still saved in "Design".</p>
+          <button id="tidyUndo" type="button" hidden>Undo</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Privacy -->
+  <section class="section privacy-band" id="privacy">
+    <div class="wrap">
+      <div class="sect-head">
+        <h2>Your bookmarks are not our business model.</h2>
+        <p>Bookmark Hub has no account, no analytics and no server. It reads your bookmarks through the browser's own API, on your device, and stops there.</p>
+      </div>
+      <div class="privacy-grid">
+        <article>
+          <h3>Nothing leaves the browser</h3>
+          <p>The extension has no backend and sends no bookmark data anywhere. It works offline; only optional previews make a network request.</p>
+        </article>
+        <article>
+          <h3>Previews only when you ask</h3>
+          <p>Page previews are off until you click Enable previews. Each bookmarked page is fetched directly from its own site and cached locally.</p>
+        </article>
+        <article>
+          <h3>Site icons can be turned off</h3>
+          <p>Icons come from Google's favicon service, which means each bookmarked domain is sent to Google. One switch in Settings stops that.</p>
+        </article>
+      </div>
+      <p class="privacy-note">Read the full <a href="privacy.html">privacy policy</a> for the exact details, including how to clear the cache and remove the extension.</p>
+    </div>
+  </section>
+
+  <!-- Install -->
+  <section class="section" id="install">
+    <div class="wrap install-grid">
+      <div>
+        <div class="sect-head">
+          <h2>Three steps, then it is out of your way.</h2>
+          <p>Bookmark Hub lives in the toolbar. Click it when you need to find something; close the tab when you are done.</p>
+        </div>
+        <ol class="steps">
+          <li>
+            <div>
+              <h3>Add Bookmark Hub to your browser</h3>
+              <p>Install it from the Chrome Web Store. Edge and Brave can install Chrome extensions too. Firefox users can install the signed build from Firefox's add-ons site.</p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>Pin the icon</h3>
+              <p>Open the extensions menu and pin Bookmark Hub so it stays on the toolbar.</p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>Click the icon, or press Alt+B</h3>
+              <p>Your hub opens in a new tab. If it is already open, the same tab comes back to the front instead of opening another.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <aside class="install-card">
+        <svg class="big-logo" viewBox="0 0 32 32" aria-hidden="true">
+          <rect width="32" height="32" rx="9" fill="var(--accent)"/>
+          <path d="M10.5 7h11a1.5 1.5 0 0 1 1.5 1.5V25l-7-4.6L9 25V8.5A1.5 1.5 0 0 1 10.5 7z" fill="var(--accent-ink)"/>
+        </svg>
+        <h3>Bookmark Hub</h3>
+        <p>Every bookmark on one page. Folders, previews, instant search.</p>
+        <a class="btn js-store" href="#install">Add to Chrome</a>
+        <small>Free. No account. No ads.</small>
+        <p class="browser-note">Works in Chrome, Edge and Brave. A Firefox build is available separately.</p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section tight" id="faq">
+    <div class="wrap faq-wrap">
+      <div class="sect-head">
+        <h2>Questions worth asking</h2>
+      </div>
+      <div class="faq">
+        <details>
+          <summary>Does it replace my new tab page?</summary>
+          <p>No. Bookmark Hub opens its own tab when you click the toolbar icon or press Alt+B. Your new tab page stays exactly as it is.</p>
+        </details>
+        <details>
+          <summary>Will it change or move my bookmarks?</summary>
+          <p>It reads them and displays them. The only write is when you click Delete on a card, and that action is reversible with Undo for eight seconds. Nothing is reorganised, renamed or moved automatically.</p>
+        </details>
+        <details>
+          <summary>Why does it ask for access to all sites?</summary>
+          <p>Only for the optional page previews. The browser shows that prompt after you click Enable previews, because the extension needs to read each bookmarked page's title, description and preview image. It never runs on the pages you visit and you can revoke it in Settings.</p>
+        </details>
+        <details>
+          <summary>Where does the site-icon data come from?</summary>
+          <p>By default, favicons are loaded from Google's favicon service, so each bookmarked domain is sent to Google. The Settings panel has a Site icons switch that turns this off; the coloured tiles still work without it.</p>
+        </details>
+        <details>
+          <summary>Does it work with a large bookmark collection?</summary>
+          <p>Yes. Cards render in chunks as you scroll, and search runs on the bookmarks already loaded in the page. Thousands of bookmarks stay responsive.</p>
+        </details>
+        <details>
+          <summary>How do I remove it and its data?</summary>
+          <p>Use Settings > Page previews > Clear cache, then remove the extension from your browser's extensions page. Settings and the preview cache are stored locally by the extension and disappear with it.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap foot-in">
+    <a class="brand" href="index.html" aria-label="Bookmark Hub home">
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <rect width="32" height="32" rx="9" fill="var(--accent)"/>
+        <path d="M10.5 7h11a1.5 1.5 0 0 1 1.5 1.5V25l-7-4.6L9 25V8.5A1.5 1.5 0 0 1 10.5 7z" fill="var(--accent-ink)"/>
+      </svg>
+      <span>Bookmark Hub</span>
+    </a>
+    <nav class="foot-links" aria-label="Footer">
+      <a href="privacy.html">Privacy</a>
+      <a href="#faq">FAQ</a>
+      <a href="#install">Install</a>
+    </nav>
+    <p class="foot-note">Bookmarks stay in your browser. Questions and bug reports: use the Support tab on the Chrome Web Store listing.</p>
+  </div>
+</footer>
+
+<script>
+(() => {
+  "use strict";
+
+  // Paste the Chrome Web Store listing URL here when it is live.
+  // While it is empty, every .js-store button scrolls to the install section.
+  const STORE_URL = "";
+
+  const root = document.documentElement;
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const escRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  /* ---------- Store buttons ---------- */
+  $$(".js-store").forEach((a) => {
+    if (STORE_URL) {
+      a.href = STORE_URL;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+    } else {
+      a.href = "#install";
+    }
+  });
+
+  /* ---------- Theme ---------- */
+  const themeBtn = $("#themeBtn");
+  const modes = ["auto", "light", "dark"];
+  let mode = "auto";
+  try { mode = localStorage.getItem("bh-theme") || "auto"; } catch { /* file:// or blocked storage */ }
+  if (!modes.includes(mode)) mode = "auto";
+  function applyTheme() {
+    if (mode === "auto") delete root.dataset.theme;
+    else root.dataset.theme = mode;
+    const label = mode === "auto" ? "Theme: follow system" : mode === "light" ? "Theme: light" : "Theme: dark";
+    themeBtn.setAttribute("aria-label", label);
+    themeBtn.title = label;
+  }
+  themeBtn.addEventListener("click", () => {
+    mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+    try { localStorage.setItem("bh-theme", mode); } catch { /* ignore */ }
+    applyTheme();
+  });
+  applyTheme();
+
+  /* ---------- Sample data (public sites, not the user's bookmarks) ---------- */
+  const D = (y, m, d) => new Date(y, m - 1, d).getTime();
+  const demo = [
+    { title: "Linear — plan and build products", url: "https://linear.app/", host: "linear.app", folder: "Work", added: D(2026, 11, 12) },
+    { title: "Figma: the collaborative interface design tool", url: "https://www.figma.com/", host: "figma.com", folder: "Design", added: D(2026, 11, 9) },
+    { title: "GitHub — vercel/next.js", url: "https://github.com/vercel/next.js", host: "github.com", folder: "Code", added: D(2026, 11, 8) },
+    { title: "MDN Web Docs: CSS grid layout", url: "https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_grid_layout", host: "developer.mozilla.org", folder: "Docs", added: D(2026, 11, 5) },
+    { title: "The best sourdough starter recipe", url: "https://www.kingarthurbaking.com/recipes/sourdough-starter-recipe", host: "kingarthurbaking.com", folder: "Recipes", added: D(2026, 11, 2) },
+    { title: "Braised chickpeas with yogurt", url: "https://smittenkitchen.com/2024/01/braised-chickpeas-with-yogurt/", host: "smittenkitchen.com", folder: "Recipes", added: D(2026, 10, 28) },
+    { title: "React reference: hooks", url: "https://react.dev/reference/react", host: "react.dev", folder: "Code", added: D(2026, 10, 26) },
+    { title: "Notion — notes, docs and projects", url: "https://www.notion.so/", host: "notion.so", folder: "Work", added: D(2026, 10, 22) },
+    { title: "Stripe API reference", url: "https://docs.stripe.com/api", host: "stripe.com", folder: "Work", added: D(2026, 10, 19) },
+    { title: "Dribbble — discover designers", url: "https://dribbble.com/", host: "dribbble.com", folder: "Design", added: D(2026, 10, 15) },
+    { title: "Unsplash — free images", url: "https://unsplash.com/", host: "unsplash.com", folder: "Design", added: D(2026, 10, 11) },
+    { title: "PostgreSQL documentation", url: "https://www.postgresql.org/docs/", host: "postgresql.org", folder: "Docs", added: D(2026, 10, 7) },
+    { title: "Hacker News", url: "https://news.ycombinator.com/", host: "news.ycombinator.com", folder: "Reading", added: D(2026, 9, 30) },
+    { title: "The Marginalian", url: "https://www.themarginalian.org/", host: "themarginalian.org", folder: "Reading", added: D(2026, 9, 24) },
+    { title: "Type Scale — a visual type calculator", url: "https://typescale.com/", host: "typescale.com", folder: "Design", added: D(2026, 9, 18) },
+    { title: "Can I use — browser support tables", url: "https://caniuse.com/", host: "caniuse.com", folder: "Docs", added: D(2026, 9, 12) },
+    { title: "Vite guide", url: "https://vite.dev/guide/", host: "vite.dev", folder: "Code", added: D(2026, 9, 6) },
+    { title: "Cloudflare Workers docs", url: "https://developers.cloudflare.com/workers/", host: "developers.cloudflare.com", folder: "Code", added: D(2026, 8, 29) },
+    { title: "Halal cart-style chicken with white sauce", url: "https://www.seriouseats.com/halal-cart-style-chicken", host: "seriouseats.com", folder: "Recipes", added: D(2026, 8, 22) },
+    { title: "Lofi beats to work to", url: "https://www.youtube.com/watch?v=jfKfPfyJRdk", host: "youtube.com", folder: "Music", added: D(2026, 8, 15) },
+    { title: "Discover Weekly", url: "https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M", host: "open.spotify.com", folder: "Music", added: D(2026, 8, 9) },
+    { title: "Tailwind CSS documentation", url: "https://tailwindcss.com/docs", host: "tailwindcss.com", folder: "Code", added: D(2026, 8, 4) },
+    { title: "A List Apart", url: "https://alistapart.com/", host: "alistapart.com", folder: "Reading", added: D(2026, 7, 28) },
+    { title: "Figma: the collaborative interface design tool", url: "https://www.figma.com/", host: "figma.com", folder: "Design", added: D(2026, 7, 20) },
+    { title: "GitHub — vercel/next.js", url: "https://github.com/vercel/next.js", host: "github.com", folder: "Code", added: D(2026, 7, 14) },
+    { title: "Notion — notes, docs and projects", url: "https://www.notion.so/", host: "notion.so", folder: "Work", added: D(2026, 7, 8) },
+    { title: "", url: "https://www.are.na/", host: "are.na", folder: "Design", added: D(2026, 7, 3) },
+    { title: "", url: "https://readwise.io/read", host: "readwise.io", folder: "Reading", added: D(2026, 6, 27) }
+  ];
+
+  /* ---------- Wireframe thumbnails ---------- */
+  const hueOf = (host) => {
+    let h = 7;
+    for (let i = 0; i < host.length; i++) h = (h * 31 + host.charCodeAt(i)) >>> 0;
+    h %= 360;
+    if (h >= 40 && h < 110) h = (h + 120) % 360;
+    return h;
+  };
+  const hashOf = (s) => {
+    let h = 0;
+    for (let i = 0; i < s.length; i++) h = (h * 33 + s.charCodeAt(i)) >>> 0;
+    return h;
+  };
+  function wire(host) {
+    const h = hueOf(host);
+    const c = (l, s = 55) => `hsl(${h} ${s}% ${l}%)`;
+    const v = hashOf(host) % 4;
+    const layouts = [
+      `<rect x="18" y="44" width="126" height="13" rx="6" fill="${c(30, 42)}"/>
+       <rect x="18" y="65" width="92" height="7" rx="3.5" fill="${c(60, 22)}"/>
+       <rect x="18" y="84" width="284" height="62" rx="9" fill="${c(74, 50)}"/>
+       <rect x="18" y="156" width="132" height="7" rx="3.5" fill="${c(80, 16)}"/>
+       <rect x="18" y="170" width="186" height="7" rx="3.5" fill="${c(84, 12)}"/>`,
+      `<rect x="18" y="42" width="176" height="13" rx="6" fill="${c(30, 42)}"/>
+       <rect x="18" y="63" width="118" height="7" rx="3.5" fill="${c(60, 22)}"/>
+       <rect x="18" y="84" width="94" height="76" rx="8" fill="${c(74, 50)}"/>
+       <rect x="124" y="86" width="178" height="8" rx="4" fill="${c(80, 16)}"/>
+       <rect x="124" y="101" width="166" height="8" rx="4" fill="${c(82, 14)}"/>
+       <rect x="124" y="116" width="174" height="8" rx="4" fill="${c(84, 12)}"/>
+       <rect x="124" y="131" width="120" height="8" rx="4" fill="${c(86, 10)}"/>
+       <rect x="18" y="174" width="284" height="7" rx="3.5" fill="${c(84, 12)}"/>`,
+      `<rect x="18" y="42" width="284" height="40" rx="8" fill="${c(74, 50)}"/>
+       <rect x="18" y="94" width="86" height="54" rx="7" fill="${c(84, 38)}"/>
+       <rect x="114" y="94" width="86" height="54" rx="7" fill="${c(80, 44)}"/>
+       <rect x="210" y="94" width="92" height="54" rx="7" fill="${c(76, 50)}"/>
+       <rect x="18" y="160" width="150" height="8" rx="4" fill="${c(80, 16)}"/>
+       <rect x="18" y="175" width="210" height="7" rx="3.5" fill="${c(84, 12)}"/>`,
+      `<rect x="18" y="43" width="140" height="12" rx="6" fill="${c(30, 42)}"/>
+       <rect x="18" y="62" width="96" height="7" rx="3.5" fill="${c(60, 22)}"/>
+       <rect x="236" y="40" width="66" height="22" rx="11" fill="${c(58, 46)}"/>
+       <rect x="18" y="84" width="284" height="42" rx="8" fill="${c(82, 36)}"/>
+       <rect x="18" y="138" width="284" height="8" rx="4" fill="${c(82, 16)}"/>
+       <rect x="18" y="154" width="252" height="8" rx="4" fill="${c(84, 14)}"/>
+       <rect x="18" y="170" width="180" height="8" rx="4" fill="${c(86, 12)}"/>`
+    ];
+    return `<svg viewBox="0 0 320 200" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <rect width="320" height="200" fill="#fbfcfe"/>
+      <rect width="320" height="27" fill="${c(94, 30)}"/>
+      <circle cx="13" cy="13.5" r="3" fill="${c(58, 40)}"/>
+      <circle cx="23" cy="13.5" r="3" fill="${c(58, 32)}"/>
+      <circle cx="33" cy="13.5" r="3" fill="${c(58, 24)}"/>
+      <rect x="44" y="8" width="118" height="11" rx="5.5" fill="#fff" opacity=".7"/>
+      ${layouts[v]}
+    </svg>`;
+  }
+  $$("[data-wire]").forEach((node) => { node.innerHTML = wire(node.dataset.wire); });
+
+  /* ---------- Demo search ---------- */
+  const qEl = $("#demoQ");
+  const gridEl = $("#demoResults");
+  const countEl = $("#demoCount");
+  const clearEl = $("#demoClear");
+  const dateFmt = new Intl.DateTimeFormat("en", { day: "numeric", month: "short" });
+  let activeTerms = [];
+
+  function parseQuery(raw) {
+    const P = { terms: [], neg: [], site: [], folder: [] };
+    const re = /(-?)(?:(folder|in|site):)?(?:"([^"]*)"|(\S+))/gi;
+    let m;
+    while ((m = re.exec(raw))) {
+      const val = (m[3] ?? m[4] ?? "").toLowerCase().trim();
+      if (!val) continue;
+      const key = (m[2] || "").toLowerCase();
+      if (key === "site") P.site.push(val);
+      else if (key === "folder" || key === "in") P.folder.push(val);
+      else if (m[1]) P.neg.push(val);
+      else P.terms.push(val);
+    }
+    return P;
+  }
+
+  function score(it, P) {
+    const title = (it.title || it.host).toLowerCase();
+    const host = it.host.toLowerCase();
+    const url = it.url.toLowerCase();
+    const folder = it.folder.toLowerCase();
+    for (const s of P.site) if (!host.includes(s)) return -1;
+    for (const f of P.folder) if (!folder.includes(f)) return -1;
+    for (const n of P.neg) if (title.includes(n) || host.includes(n) || url.includes(n) || folder.includes(n)) return -1;
+    let total = 0;
+    for (const t of P.terms) {
+      let s = 0;
+      if (title.includes(t)) s += title.includes(" " + t) || title.startsWith(t) ? 15 : 10;
+      if (host.includes(t)) s += 8;
+      if (folder.includes(t)) s += 4;
+      if (url.includes(t)) s += 3;
+      if (!s) return -1;
+      total += s;
+    }
+    return total;
+  }
+
+  function hl(text, terms) {
+    if (!terms.length) return esc(text);
+    const re = new RegExp("(" + terms.map(escRe).join("|") + ")", "gi");
+    return text.split(re).map((part, i) => (i % 2 ? `<mark>${esc(part)}</mark>` : esc(part))).join("");
+  }
+
+  const prettyUrl = (it) => {
+    try {
+      const u = new URL(it.url);
+      return (it.host + u.pathname.replace(/\/$/, "")).slice(0, 60);
+    } catch { return it.url; }
+  };
+
+  function cardHtml(it) {
+    const title = it.title || prettyUrl(it);
+    const folder = it.folder;
+    return `<article class="d-card">
+      <div class="d-thumb">${wire(it.host)}</div>
+      <div class="d-body">
+        <a class="d-title${it.title ? "" : " untitled"}" href="${esc(it.url)}" target="_blank" rel="noopener noreferrer">${hl(title, activeTerms)}</a>
+        <div class="d-meta">
+          <span class="d-fav" style="--h:${hueOf(it.host)}" aria-hidden="true">${esc((it.host.match(/[a-z0-9]/i) || ["b"])[0].toUpperCase())}</span>
+          <span class="d-host">${hl(it.host, activeTerms)}</span>
+          <span class="d-date">${dateFmt.format(it.added)}</span>
+        </div>
+        ${folder ? `<span class="d-chip">${esc(folder)}</span>` : ""}
+      </div>
+    </article>`;
+  }
+
+  function renderDemo() {
+    const raw = qEl.value.trim();
+    const P = parseQuery(raw);
+    activeTerms = P.terms;
+    const matches = raw
+      ? demo.map((it) => [it, score(it, P)]).filter(([, s]) => s >= 0).sort((a, b) => b[1] - a[1] || b[0].added - a[0].added).map(([it]) => it)
+      : demo;
+    gridEl.innerHTML = matches.length
+      ? matches.map(cardHtml).join("")
+      : `<div class="demo-empty">No matches in this demo. Try <b>docs</b>, <b>recipe</b> or clear the search.<br><button type="button" id="demoReset">Clear search</button></div>`;
+    countEl.innerHTML = raw
+      ? `<b>${matches.length}</b> of ${demo.length} bookmarks for “${esc(raw)}”`
+      : `<b>${demo.length}</b> bookmarks`;
+    clearEl.hidden = !raw;
+    const reset = $("#demoReset");
+    if (reset) reset.addEventListener("click", clearSearch);
+  }
+
+  function setQuery(value) {
+    qEl.value = value;
+    renderDemo();
+  }
+  function clearSearch() {
+    qEl.value = "";
+    renderDemo();
+    qEl.focus();
+  }
+
+  qEl.addEventListener("input", renderDemo);
+  qEl.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && qEl.value) { e.stopPropagation(); clearSearch(); }
+  });
+  clearEl.addEventListener("click", clearSearch);
+  $$(".demo-chips [data-try]").forEach((b) => b.addEventListener("click", () => {
+    setQuery(b.dataset.try);
+    qEl.focus();
+  }));
+  renderDemo();
+
+  // "/" focuses the demo search, like it does inside the extension.
+  document.addEventListener("keydown", (e) => {
+    const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || "");
+    if (e.key === "/" && !typing && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      e.preventDefault();
+      qEl.scrollIntoView({ block: "center", behavior: "smooth" });
+      qEl.focus();
+      qEl.select();
+    }
+  });
+
+  /* ---------- Duplicate delete + undo demo ---------- */
+  const dupCopy = $("#dupCopy");
+  const dupDelete = $("#dupDelete");
+  const tidyToast = $("#tidyToast");
+  const tidyText = $("#tidyText");
+  const tidyUndo = $("#tidyUndo");
+  let undoTimer = null;
+
+  dupDelete.addEventListener("click", () => {
+    dupCopy.classList.add("hidden");
+    dupDelete.disabled = true;
+    tidyText.textContent = 'Deleted this copy. The other copy is still saved in "Design".';
+    tidyToast.dataset.hidden = "false";
+    tidyUndo.hidden = false;
+    clearTimeout(undoTimer);
+    undoTimer = setTimeout(hideTidyToast, 8000);
+  });
+  tidyUndo.addEventListener("click", () => {
+    clearTimeout(undoTimer);
+    dupCopy.classList.remove("hidden");
+    dupDelete.disabled = false;
+    tidyText.textContent = "Bookmark restored.";
+    tidyUndo.hidden = true;
+    undoTimer = setTimeout(hideTidyToast, 2200);
+  });
+  function hideTidyToast() {
+    tidyToast.dataset.hidden = "true";
+    tidyUndo.hidden = true;
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+# Build output
+dist/
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini

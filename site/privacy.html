@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Privacy policy — Bookmark Hub</title>
+<meta name="description" content="How Bookmark Hub handles your bookmarks, settings and optional page previews. No account, no analytics, no server.">
+<link rel="canonical" href="https://visalrazazaidi.github.io/bookmark-hub/privacy.html">
+<link rel="icon" href="assets/icon-32.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400..700&display=swap">
+<style>
+  :root {
+    color-scheme: light dark;
+    --paper: #e9edf3; --card: #fff; --ink: #0e1830; --mute: #586178; --line: #d5dbe6;
+    --accent: #3140ee; --accent-ink: #fff; --accent-soft: #dfe4ff; --hl: #ffe26b;
+    --display: "Bricolage Grotesque", "Inter", system-ui, sans-serif;
+    --body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0b101d; --card: #151d31; --ink: #e9edf8; --mute: #8f9bb6; --line: #232d47;
+      --accent: #93a2ff; --accent-ink: #0b101d; --accent-soft: #1c2850;
+    }
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --paper: #e9edf3; --card: #fff; --ink: #0e1830; --mute: #586178; --line: #d5dbe6;
+    --accent: #3140ee; --accent-ink: #fff; --accent-soft: #dfe4ff;
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper: #0b101d; --card: #151d31; --ink: #e9edf8; --mute: #8f9bb6; --line: #232d47;
+    --accent: #93a2ff; --accent-ink: #0b101d; --accent-soft: #1c2850;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font: 400 16px/1.65 var(--body); -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; font-weight: 500; }
+  a:hover { text-decoration: underline; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+  .wrap { width: min(780px, calc(100% - 48px)); margin-inline: auto; }
+  .site-head { border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--paper) 90%, transparent); position: sticky; top: 0; backdrop-filter: blur(10px); z-index: 10; }
+  .head-in { display: flex; align-items: center; gap: 16px; height: 66px; }
+  .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); font: 800 18px/1 var(--display); letter-spacing: -.02em; }
+  .brand svg { width: 28px; height: 28px; }
+  .back { margin-left: auto; font-size: 14px; color: var(--mute); font-weight: 500; }
+  .back:hover { color: var(--ink); }
+  .theme-btn {
+    display: grid; place-items: center; width: 36px; height: 36px; border-radius: 9px;
+    border: 1px solid var(--line); background: var(--card); color: var(--mute); cursor: pointer;
+  }
+  .theme-btn:hover { color: var(--ink); border-color: var(--accent); }
+  .theme-btn svg { width: 16px; height: 16px; }
+  main { padding: 56px 0 72px; }
+  .kicker { font-size: 13.5px; color: var(--mute); margin-bottom: 10px; }
+  h1 { font: 800 clamp(34px, 5vw, 50px)/1.02 var(--display); letter-spacing: -.04em; margin: 0 0 18px; text-wrap: balance; }
+  .lede { font-size: 18px; color: var(--mute); max-width: 62ch; margin: 0 0 34px; }
+  .summary {
+    border: 1px solid var(--line); background: var(--card); border-radius: 14px; padding: 22px 24px; margin-bottom: 40px;
+  }
+  .summary p { margin: 0; font-size: 15px; }
+  .summary p + p { margin-top: 10px; }
+  section { padding: 26px 0; border-top: 1px solid var(--line); }
+  h2 { font: 700 21px/1.3 var(--display); letter-spacing: -.015em; margin: 0 0 10px; }
+  h3 { font: 650 16px/1.4 var(--body); margin: 20px 0 6px; }
+  p { margin: 0 0 12px; }
+  p:last-child { margin-bottom: 0; }
+  ul { margin: 0 0 12px; padding-left: 22px; }
+  li { margin-bottom: 7px; }
+  code {
+    font: 500 13.5px/1.3 ui-monospace, "SF Mono", Consolas, monospace;
+    background: var(--accent-soft); color: var(--ink); padding: 2px 6px; border-radius: 5px;
+  }
+  .muted { color: var(--mute); font-size: 14px; }
+  .note { border-left: 3px solid var(--accent); padding: 2px 0 2px 16px; margin: 18px 0; color: var(--mute); font-size: 14.5px; }
+  footer { border-top: 1px solid var(--line); padding: 28px 0 48px; font-size: 14px; color: var(--mute); }
+  footer p { margin: 0; }
+  @media (max-width: 520px) {
+    .wrap { width: calc(100% - 32px); }
+    main { padding: 40px 0 56px; }
+    .brand span { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="site-head">
+  <div class="wrap head-in">
+    <a class="brand" href="index.html" aria-label="Bookmark Hub home">
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <rect width="32" height="32" rx="9" fill="var(--accent)"/>
+        <path d="M10.5 7h11a1.5 1.5 0 0 1 1.5 1.5V25l-7-4.6L9 25V8.5A1.5 1.5 0 0 1 10.5 7z" fill="var(--accent-ink)"/>
+      </svg>
+      <span>Bookmark Hub</span>
+    </a>
+    <a class="back" href="index.html">Back to home</a>
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="Change theme" title="Change theme">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.2 5.2l1.4 1.4M17.4 17.4l1.4 1.4M5.2 18.8l1.4-1.4M17.4 6.6l1.4-1.4"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="kicker">Effective 13 November 2026</p>
+  <h1>Privacy policy</h1>
+  <p class="lede">Bookmark Hub is a browser extension that shows and searches the bookmarks already saved in your browser. This page explains exactly what it reads, what it stores and what leaves your device.</p>
+
+  <div class="summary">
+    <p><strong>The short version:</strong> your bookmarks stay in your browser. There is no account, no analytics, no advertising and no Bookmark Hub server. The developer receives no data.</p>
+    <p>The only network requests are the ones you opt into: optional page previews, which go directly to the bookmarked sites, and site icons, which go to Google's favicon service unless you turn them off.</p>
+  </div>
+
+  <section>
+    <h2>What the extension reads</h2>
+    <p>With the <code>bookmarks</code> permission, Bookmark Hub reads your browser's bookmark tree: each bookmark's title, URL, folder and date added, plus folder names. It uses that information only to draw its own page: the folder tree, counts, cards, previews and search results.</p>
+    <p>Bookmark Hub does not read your browsing history, the pages you currently have open, form data, passwords or cookies. It does not run on the websites you visit.</p>
+  </section>
+
+  <section>
+    <h2>What is stored on your device</h2>
+    <p>Two things are saved in the extension's local storage, in your browser profile:</p>
+    <ul>
+      <li><strong>Settings</strong>, such as theme, layout, sort order and whether site icons are on.</li>
+      <li><strong>The optional preview cache</strong>: page titles, descriptions, preview-image addresses and icon addresses that the extension fetched, so it does not fetch the same page twice.</li>
+    </ul>
+    <p>This storage is local to your browser. It is not synced by Bookmark Hub and is not sent to the developer. Removing the extension deletes it.</p>
+  </section>
+
+  <section>
+    <h2>Optional page previews</h2>
+    <p>Page previews are off until you click <strong>Enable previews</strong>. At that point the browser asks you to grant the optional “all sites” permission, which the extension needs to read each bookmarked page's <code>&lt;head&gt;</code>.</p>
+    <p>When previews are on, the extension requests each bookmarked page directly from the site that hosts it. It reads the page title, description, preview image address and site icon, then caches the result locally. Requests are sent without your cookies (<code>credentials: "omit"</code>).</p>
+    <p>Those websites can see the request the same way they see any other visit: your IP address, browser user agent and the page requested. Bookmark Hub does not send them your bookmark list or any other information about you.</p>
+    <p>You can stop this at any time with <strong>Settings &gt; Page previews &gt; Turn off</strong>, and delete what was cached with <strong>Clear cache</strong>.</p>
+  </section>
+
+  <section>
+    <h2>Site icons and Google's favicon service</h2>
+    <p>To show a recognisable icon on each card, Bookmark Hub requests it from Google's favicon service (<code>google.com/s2/favicons</code>) by default. That means the domain of each bookmarked site is sent to Google, together with the normal technical details of the request.</p>
+    <p>Google's handling of that request is covered by Google's own privacy policy. If you would rather not send domains to Google, turn off <strong>Site icons</strong> in Settings. Cards still work; they use a coloured tile built from the site name instead.</p>
+  </section>
+
+  <section>
+    <h2>Deleting bookmarks</h2>
+    <p>Bookmark Hub only deletes a bookmark when you click the Delete button on a card. It never deletes in the background. Each click removes exactly one bookmark, identified by its unique browser id, not by its URL.</p>
+    <p>After a delete, an <strong>Undo</strong> button stays available for eight seconds. Undo recreates the bookmark in its original folder and position. Deleting a duplicate does not delete the other copies of the same link.</p>
+  </section>
+
+  <section>
+    <h2>What is never collected</h2>
+    <ul>
+      <li>No account, sign-up or personal identifiers.</li>
+      <li>No analytics, telemetry, crash reporting or tracking pixels.</li>
+      <li>No advertising and no selling or sharing of data with third parties.</li>
+      <li>No bookmark data sent to the developer or any Bookmark Hub server, because there is no server.</li>
+      <li>No remote code: all JavaScript is bundled inside the extension package.</li>
+    </ul>
+    <div class="note">The extension's only permissions are <code>bookmarks</code> and <code>storage</code>, plus the optional all-sites permission used for previews after you enable them. It deliberately does not request the <code>tabs</code> permission.</div>
+  </section>
+
+  <section>
+    <h2>Retention and how to clear your data</h2>
+    <p>Settings and cached previews stay on your device until you remove them. To clear everything:</p>
+    <ul>
+      <li>Open Bookmark Hub's Settings and use <strong>Page previews &gt; Clear cache</strong> to delete cached page data.</li>
+      <li>Use <strong>Turn off</strong> to revoke the optional all-sites permission.</li>
+      <li>Remove Bookmark Hub from your browser's extensions page to delete its local storage. Any bookmarks you deleted yourself remain deleted; the browser's own bookmark data is otherwise untouched.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Children</h2>
+    <p>Bookmark Hub is a general-purpose productivity tool. It is not directed at children and collects no personal information from anyone.</p>
+  </section>
+
+  <section>
+    <h2>Changes to this policy</h2>
+    <p>If the extension's behaviour changes in a way that affects this policy, this page will be updated and the effective date above will change. Material changes will also be noted in the extension's release notes on its store listing.</p>
+  </section>
+
+  <section>
+    <h2>Contact</h2>
+    <p>Questions about privacy or data handling: use the <strong>Support</strong> tab on the Bookmark Hub listing in the Chrome Web Store. That is the monitored contact channel; no personal email address is published here.</p>
+    <p class="muted">This policy applies to the Bookmark Hub extension for Chrome, Edge, Brave and Firefox, and to this website. The website sets no cookies and runs no analytics. Its two typefaces are loaded from Google Fonts, which receives your IP address as part of that request; the extension itself bundles its fonts locally and makes no such request.</p>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Bookmark Hub · <a href="index.html">Home</a> · Effective 13 November 2026</p>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const root = document.documentElement;
+  const btn = document.getElementById("themeBtn");
+  const modes = ["auto", "light", "dark"];
+  let mode = "auto";
+  try { mode = localStorage.getItem("bh-theme") || "auto"; } catch { /* storage blocked */ }
+  if (!modes.includes(mode)) mode = "auto";
+  function apply() {
+    if (mode === "auto") delete root.dataset.theme;
+    else root.dataset.theme = mode;
+    const label = mode === "auto" ? "Theme: follow system" : mode === "light" ? "Theme: light" : "Theme: dark";
+    btn.setAttribute("aria-label", label);
+    btn.title = label;
+  }
+  btn.addEventListener("click", () => {
+    mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+    try { localStorage.setItem("bh-theme", mode); } catch { /* ignore */ }
+    apply();
+  });
+  apply();
+})();
+</script>
+</body>
+</html>
